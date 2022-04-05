@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Series de tiempo II - Tópicos avanzados</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Shu Wei Chou C." />
+    <script src="clase02_files/header-attrs/header-attrs.js"></script>
+    <link href="clase02_files/remark-css/robot-fonts.css" rel="stylesheet" />
+    <link href="clase02_files/remark-css/robot.css" rel="stylesheet" />
+    <link href="clase02_files/remark-css/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Series de tiempo II - Tópicos avanzados
+## (PF-1360 y SP-2600)
+### Prof. Shu Wei Chou C.
+### Posgrado en Matemática - Posgrado en Estadística, UCR
+### 05-04-2022
+
+---
+
+
+
+
+
+
+
+### Tema 1
+
+### Análisis espectral de series temporales
+
+
+---
+### Contenido
+
+1. Introducción
+2. Ejemplos de motivación
+3. Comportamiento cíclico y periodicidad.
+4. Estimación y periodograma.
+
+---
+### Introducción
+
+- Hasta el momento hemos centrado el análisis de series temporales en el **dominio de tiempo**.
+- Vamos a enfocar el estudio de series temporales en el **dominio de frecuencias**.
+- Es decir, expresar las características de las series en término de las variaciones periódicas.
+- Por ejemplo, 
+  - para datos trimestrales que presentan un ciclo por año, i.e. periodicidad de 4, o `\(\omega=0.25\)` ciclos por observación.
+  - para datos mensuales que presentan un ciclo por año, i.e. periodicidad de 12, o `\(\omega=1/12=0.083\)` ciclos por observación.
+- Existen muchas escalas de frecuencia.
+- Nosotros vamos a utilizar la frecuencia como `\(\omega\)`. Alternativamente, se puede definir `\(\lambda=2 \pi \omega\)`, que está dado por radianes por observación.
+
+---
+### Ejemplo 1: pasajeros
+
+- La base de datos "AirPassenger" en R proporciona total de pasajeros mensuales de una aerolínea estadounidense de 1949 a 1960. 
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-2-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+- En este caso, la periodicidad dominante de esta serie es `\(1/\omega=12\)` periodos por ciclo, o la frecuencia dominante es `\(\omega=0.083\)`.
+
+- ¿Hay alguna manera formal de detectar esta periodicidad?
+
+
+---
+### Ejemplo 1: pasajeros
+
+- Aplicamos el logarítmo para estabilizar la variabilidad y quitamos la tendencia lineal de los datos. 
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-3-1.png" width="30%" /&gt;&lt;img src="clase02_files/figure-html/unnamed-chunk-3-2.png" width="30%" /&gt;&lt;img src="clase02_files/figure-html/unnamed-chunk-3-3.png" width="30%" /&gt;
+
+
+- Note que la ACF nos da indicación de que al quitar la tendencia, puede haber periodicidad de 12 meses.
+
+
+
+---
+### Ejemplo 1: pasajeros
+
+**Periodograma:**
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-4-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+### Ejemplo 2: Corriente de rio
+
+- El flujo mensual del rio de Iowa medido en Wapello, Iowa de septiembre 1958 a agosto 2006.
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-5-1.png" width="30%" /&gt;&lt;img src="clase02_files/figure-html/unnamed-chunk-5-2.png" width="30%" /&gt;&lt;img src="clase02_files/figure-html/unnamed-chunk-5-3.png" width="30%" /&gt;
+
+---
+### Ejemplo 3: Producción de leche
+
+- Producción de leche promedio por vaca en Estados Unidos de enero 1994 a diciembre 2005.
+
+.pull-left[
+&lt;img src="clase02_files/figure-html/unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;" /&gt;&lt;img src="clase02_files/figure-html/unnamed-chunk-6-2.png" width="50%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="clase02_files/figure-html/unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" /&gt;&lt;img src="clase02_files/figure-html/unnamed-chunk-7-2.png" width="50%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+### Comportamiento cíclico y periodicidad
+
+.pull-left[
+
+- Considere `\(x_t=2 \cos \left( 2 \pi \frac{t+15}{50} \right)+ w_t\)` para `\(t=1,...,500\)`.
+
+- El modelo general `\(A cos(2\pi \omega t + \phi)\)` con amplitud `\(A\)`, frecuencia `\(\omega\)`, y fase `\(\phi\)`.
+
+- El ejemplo anterior considera `\(A=2\)`, `\(\omega=1/50\)` (un ciclo cada 50 puntos en el tiempo) y `\(\phi=2 \pi 15/50=0.6 \pi\)`.
+
+
+]
+.pull-right[
+&lt;img src="clase02_files/figure-html/unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+### Comportamiento cíclico y periodicidad
+
+- Ahora considere el modelo: 
+`$$x_t=A cos(2\pi \omega t + \phi)$$` 
+con amplitud `\(A\)`, frecuencia `\(\omega\)`, y fase `\(\phi\)` (que determina dónde inicia la función coseno).
+
+- Usando la identidad trigonométrica `\(cos(\alpha\pm\beta)=cos(\alpha)cos(\beta)\mp sin(\alpha)sin(\beta)\)`, se puede reescribir el modelo como:
+`$$x_t=U_1 cos(2\pi \omega t )+U_2 sin(2\pi \omega t ),$$`
+donde `\(U_1=A cos\phi\)` y `\(U_2=-A sin\phi\)`.
+
+
+---
+### Comportamiento cíclico y periodicidad
+
+- Vamos a concentrar en este modelo:
+
+`$$x_t=U_1 cos(2\pi \omega t )+U_2 sin(2\pi \omega t ),$$`
+donde `\(U_1=A cos\phi\)` y `\(U_2=-A sin\phi\)`.
+
+
+
+- Suponga que `\(U_1\)` y `\(U_2\)` son variables aleatorias no correlacionadas con media `\(0\)` y variancia `\(\sigma^2\)`. Se puede comprobar que el proceso estocástico `\(x_t\)` es estacionario con media `\(0\)` y su función de autocovariancia es dada por:
+
+`$$\gamma_X(h)=Cov(x_{t+h},x_t)=\sigma^2 cos(2 \pi \omega h).$$`
+- Note que `\(Var(x_t)=\gamma_X(0)=\sigma^2\)`.
+
+---
+### Comportamiento cíclico y periodicidad
+
+- Note que el modelo
+`$$x_t=U_1 cos(2\pi \omega t )+U_2 sin(2\pi \omega t ),$$`
+es función de su frecuencia, `\(\omega\)`.
+
+- Si `\(\omega=1\)`, la serie realiza un ciclo cada unidad de tiempo.
+- Si `\(\omega=0.5\)`, la serie realiza un ciclo cada 2 unidades de tiempo.
+- Si `\(\omega=0.25\)`, la serie realiza un ciclo cada 4 unidades de tiempo.
+
+- En la práctica, al observar tiempos discretos, necesitamos por lo menos 2 puntos para determinar un ciclo, entonces nos interesa frecuencia máxima de 0.5 ciclos por unidad de tiempo.
+
+
+---
+### Comportamiento cíclico y periodicidad
+
+- vamos a generalizar el modelo anterior a `\(q\)` mezclas de series periódicas.
+
+`$$x_t=\sum_{k=1}^q U_{k1} cos(2\pi \omega_k t )+U_{k2} sin(2\pi \omega_k t ),$$`
+donde `\(U_{k1},U_{k2}\)`, para `\(k=1,...,q\)` son v.a. con media cero con variancia `\(\sigma_k^2\)` y no correlacionadas, y `\(\omega_k\)` son frecuencias distintas.
+
+- Se puede comprobar que 
+`$$\gamma_X(h)=\sum_{k=1}^q \sigma_k^2 cos(2 \pi \omega_k h).$$`
+- De esta forma, `\(x_t\)` es estacionario con media `\(0\)` y variancia `\(\gamma_X(0)=\sum_{k=1}^q \sigma_k^2\)`.
+
+---
+### Comportamiento cíclico y periodicidad
+
+Ejemplo: 
+- Considere
+
+`$$x_t=\sum_{k=1}^q U_{k1} cos(2\pi \omega_k t )+U_{k2} sin(2\pi \omega_k t )$$`
+con `\(q=3\)`
+
+- Cada término está dado por:
+`$$x_{t1}= 2 cos(2\pi t 6/100)+3 sin(2\pi t 6/100)$$`
+`$$x_{t2}= 4 cos(2\pi t 10/100)+5 sin(2\pi t 10/100)$$`
+`$$x_{t3}= 6 cos(2\pi t 40/100)+7 sin(2\pi t 40/100)$$`
+
+- Interprete la frecuencia `\(\omega\)` y el ciclo `\(1/\omega\)` de cada componente.
+
+---
+### Comportamiento cíclico y periodicidad
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+### Estimación y el periodograma
+
+- Sea una serie temporal `\(x_1,...,x_T\)` con `\(T\)` impar. Se puede escribir `\(x_t\)` como
+
+`$$x_t = a_0 + \sum_{j=1}^{(T-1)/2} \left[ a_j \cos(2\pi t~j/T)+b_j \sin(2\pi t~j/T) \right].$$`
+- Si `\(T\)` es par, se puede modificar la ecuación sumando a `\((T/2-1)\)` y agregar un componente adicional por `\(a_{T/2} \cos(2\pi t~\frac{1}{2})=a_{T/2}(-1)^t\)`.
+
+- Note que `\(a_0\)`, `\(a_j\)` y `\(b_j\)` son desconocidos y requieren ser estimados. Considerando como un modelo de regresión, los coeficientes pueden ser calculados por: `\(a_0=\bar{x}\)`
+
+`$$a_j=\frac{2}{T}\sum_{t=1}^T x_t \cos(2\pi t~j/T),~~~\text{y}~~~ b_j=\frac{2}{T}\sum_{t=1}^T x_t \sin(2\pi t~j/T)$$`
+---
+### Estimación y el periodograma
+
+- Los coeficientes `\(a_j\)` y `\(b_j\)` tienen el significado de cuán grande es la amplitud de cada componente de frecuencias `\(j/T\)`.
+
+- Por consiguiente, podemos definir el **periodograma** como
+`$$P(j/T)=a_j^2+b_j^2,~ \text{para}~~ j=1,...,(T-1)/2$$`
+- Note que el periodograma expresa la serie temporal `\(x_t\)` en sumas de los componentes de frecuencias (oscilación sinusoidal) multiplicado por su variancia `\(\sigma_j^2\)`.
+
+- Valores altos de `\(P(j/T)\)` implica que la contribución de la frecuencia `\(\omega_j=j/T\)` es importante. Valores pequeños implica que son ruidos.
+
+
+---
+### Estimación y el periodograma
+
+- En la práctica, es común enfrentar series largas y el uso computacional del enfoque de regresión no es eficiente.
+
+- Se utiliza la **Transformada Discreta de Fourier (TDF)** que se discutirá con más detalles:
+
+`$$d(j/T)=\frac{1}{T^{1/2}}\sum_{t=1}^T x_t \exp{(-2 \pi it~j/T)}$$`
+`$$= \frac{1}{T^{1/2}}\sum_{t=1}^T x_t \cos(2\pi t~j/T)- i \sum_{t=1}^T x_t \sin(2\pi t~j/T)$$`
+
+---
+### Ejemplo simulado
+
+- Recuerde que
+
+`$$x_t=\sum_{k=1}^3 U_{k1} cos(2\pi \omega_k t )+U_{k2} sin(2\pi \omega_k t )$$`
+
+- Cada término está dado por:
+`$$x_{t1}= 2 cos(2\pi t 6/100)+3 sin(2\pi t 6/100)$$`
+`$$x_{t2}= 4 cos(2\pi t 10/100)+5 sin(2\pi t 10/100)$$`
+`$$x_{t3}= 6 cos(2\pi t 40/100)+7 sin(2\pi t 40/100)$$`
+
+
+---
+### Ejemplo simulado
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-10-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+### Ejemplo simulado
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-11-1.png" width="30%" style="display: block; margin: auto;" /&gt;
+
+
+- Note que:
+`\(P\left(\frac{6}{100}\right)=P\left(\frac{94}{100}\right)=13\)`, `\(P\left(\frac{10}{100}\right)=P\left(\frac{90}{100}\right)=41\)`  
+`\(P\left(\frac{40}{100}\right)=P\left(\frac{60}{100}\right)=85\)`  
+
+- Si consideramos `\(x_t\)` como un color (en forma de ondas), que está compuesto por 3 colores distintos con su intensidad (amplitud), podemos considerar el periodograma como un prisma que descompone el color `\(x_t\)` en los colores primarios (espectro).
+
+---
+### Ejemplo: Magnitud de estrella
+
+- Considere la serie temporal de la magnitud de una estrella a las 00:00 (medianoche) de 600 días consecutivos. Su gráfico y el periodograma de frecuencias menores que 0.08 se muestran a continuación.
+
+&lt;img src="clase02_files/figure-html/unnamed-chunk-12-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+- El periodograma muestra ciclos de 29 `\((\approx 1/0.035)\)` y 24  `\((\approx 1/0.041)\)` días.
+
+- Esto ocurre debido a un ruido de observación de la frecuencia real `\(\omega \pm \delta\)`. Ver el ejemplo 4.3 de Shumway &amp; Stoffer. La solución es usar periodograma suavizado.
+
+---
+### En la próxima clase veremos
+
+**Representación espectral de procesos estacionarios.**
+
+- Es necesario entender los fundamentos teóricos de los conceptos de frecuencia (poblacional) antes de entrar al caso cuando se tiene series observadas (muestral).
+
+- Vamos a ver la definición de la densidad espectral y su relación con un proceso estacionario.
+
+---
+class: center, middle
+
+## Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
