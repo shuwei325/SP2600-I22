@@ -4,8 +4,8 @@ Profesor: Shu Wei Chou Chen (<shuwei.chou@ucr.ac.cr>)
 
 ## DESCRIPCION:
 
-Es un curso introductorio teórico-práctico que proporciona los conceptos
-básicos del análisis de series cronológicas.
+El presente es un curso te´orico-pr´actico que proporciona al
+estudiantado los métodos avanzados del an´alisis de series cronológicas.
 
 Este curso es una continuación del primer curso de series cronológicas,
 el cual abarca principalmente análisis de series temporales
