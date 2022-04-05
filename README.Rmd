@@ -14,7 +14,7 @@ Profesor: Shu Wei Chou Chen (shuwei.chou@ucr.ac.cr)
 
 ## DESCRIPCION:
 
-El presente es un curso te´orico-pr´actico que proporciona al estudiantado los métodos avanzados del an´alisis de series cronológicas.
+El presente es un curso teórico-práctico que proporciona al estudiantado los métodos avanzados del análisis de series cronológicas.
 
 Este curso es una continuación del primer curso de series cronológicas, el cual abarca principalmente análisis de series temporales estacionarias y univariadas. En la práctica, las series observadas generalmente no son estacionarias, y además, es común enfrentar situaciones que presentan series temporales multivariadas. Este curso pretende profundizar los conceptos del primer curso, y proporciona herramientas avanzadas para realizar análisis y pronósticos de series temporales univariadas y multivariadas en diversas áreas de aplicaciones.
 
