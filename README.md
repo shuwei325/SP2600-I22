@@ -27,3 +27,5 @@ Las clases grabadas se encuentran
 |--------|----------------------------------------------------------------|-------------------------------------------------------|
 | 1      | [Clase 1](https://shuwei325.github.io/SP2600-I22/clase01.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab01.R) |
 | 2      | [Clase 2](https://shuwei325.github.io/SP2600-I22/clase02.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab02.R) |
+| 3      | Semana Santa                                                   |                                                       |
+| 3      | [Clase 3](https://shuwei325.github.io/SP2600-I22/clase03.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab03.R) |

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Series de tiempo II - Tópicos avanzados</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Shu Wei Chou C." />
+    <script src="clase03_files/header-attrs/header-attrs.js"></script>
+    <link href="clase03_files/remark-css/robot-fonts.css" rel="stylesheet" />
+    <link href="clase03_files/remark-css/robot.css" rel="stylesheet" />
+    <link href="clase03_files/remark-css/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Series de tiempo II - Tópicos avanzados
+## (PF-1360 y SP-2600)
+### Prof. Shu Wei Chou C.
+### Posgrado en Matemática - Posgrado en Estadística, UCR
+### 19-04-2022
+
+---
+
+
+
+
+
+
+
+### Tema 1
+
+### Análisis espectral de series temporales
+
+En la clase anterior vimos:
+
+1. Introducción
+2. Ejemplos de motivación
+3. Comportamiento cíclico y periodicidad.
+4. Estimación y periodograma.
+
+---
+### Contenido
+
+&lt;ol start="10"&gt;
+
+5. Función de densidad espectral. &lt;br&gt;
+6. Representación espectral de procesos estacionarios &lt;br&gt;
+7. Periodograma y la Transformada Discreta de Fourier&lt;br&gt;
+8. Estimación de periodograma.&lt;br&gt;
+&lt;/ol&gt;
+
+---
+### Representación espectral
+
+- Es necesario entender los fundamentos teóricos de los conceptos de frecuencia (poblacional) antes de entrar al caso cuando se tiene series observadas (muestral).
+
+- Empezamos a definir la densidad espectral y su relación con un proceso estacionario.
+
+---
+### Representación espectral
+
+
+**Propiedad 1: Representación espectral de una función de autocovariancia**
+
+Si `\(\left\lbrace x_t \right\rbrace\)` es estacionario con función de autocovariancia `\(\gamma(h)=Cov(x_{t+h},x_t)\)`, entonces existe una única función monótonamente creciente `\(F(\omega)\)`, llamada **función de distribución espectral**, con 
+- `\(F(-\infty)=F(-1/2)=0\)`, y 
+- `\(F(\infty)=F(1/2)=\gamma(0)\)`
+
+tal que
+
+`$$\gamma(h)= \int_{-\frac{1}{2}}^{\frac{1}{2}} e^{2\pi i\omega h} dF(\omega)$$`
+
+**Nota:** Esta propiedad usa el concepto de integral de Riemann-Stieltjes (ver C.4, Shumway &amp; Stoffer). Cuando la función de autocovariancia es absolutamente sumable, esa función de distribución espectral es absolutamente continua con `\(dF(\omega)=f(\omega)d\omega\)`.
+
+
+---
+### Representación espectral
+
+**Propiedad 2: Densidad espectral**
+
+Si la función de autocovariancia `\(\gamma(h)\)`, de un proceso estacionario satisface la condición
+`$$\sum_{h=-\infty}^{\infty} |\gamma(h)|&lt; \infty$$`
+entonces tiene la representación
+`$$\gamma(h)= \int_{-\frac{1}{2}}^{\frac{1}{2}} e^{2\pi i\omega h} f(\omega)d\omega,~~~ h=0,\pm 1,\pm 2,...$$`
+y la transformación inversa de la densidad espectral
+`$$f(\omega) = \sum_{h=-\infty}^{\infty} \gamma(h) e^{-2 \pi i \omega h}, ~~~~~~ -\frac{1}{2} \leq \omega \leq \frac{1}{2}$$`
+---
+### Representación espectral
+
+Algunas propiedades de la densidad espectral:
+
+- `\(f(\omega) \geq 0\)` para todo `\(\omega\)`,
+
+debido a que `\(\gamma(h)\)` es definida no negativa.
+
+- `\(f(\omega)=f(-\omega)\)`
+
+- `\(\gamma(0)= Var(x_t) = \int_{-\frac{1}{2}}^{\frac{1}{2}} f(\omega)d\omega,~~~ h=0,\pm 1,\pm 2,...\)`
+
+**Nota:** 
+- La función de autocovariancia y la función de distribución espectral contiene la misma información.
+- La FAC expresa la información en término de rezagos (tiempo), mientras que la distribución espectral expresa la misma información en término de ciclos (frecuencias).
+
+---
+### Ruido blanco
+.pull-left[
+- Una colección de variables aleatorias no correlacionadas, `\(w_t\)`, con media 0 y variancia `\(\sigma_w^2\)`, denotado por `\(w_t \sim wn(0,\sigma_w^2)\)`.
+
+- La FAC está dada por:
+
+$$
+\gamma_w(h)=\left\lbrace 
+`\begin{aligned}
+\sigma_w^2, &amp; &amp; h = 0 \\
+0, &amp; &amp;  h \neq 0.
+\end{aligned}`
+\right. 
+$$
+- Su densidad espectral está dada por:
+`$$f_w(\omega)=\sigma_w^2,$$`
+para `\(-1/2 \leq \omega \leq 1/2\)`.
+
+]
+.pull-right[
+
+- Simulación de una colección de `\(w_t \sim N(0,1)\)` con `\(T=500\)`.
+
+&lt;img src="clase03_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+]
+
+---
+### Proceso lineal
+
+- Como un proceso lineal es una herramienta que engloba varios modelos de series estacionarias (ej: ARMA), es importante presentar los resultados teóricos correspondientes. 
+
+- Un filtro lineal utiliza coeficientes `\(a_j, j=0,\pm1,...\)`, para transformar una serie *input* `\(x_t\)` a una serie *ouput* `\(y_t\)`:
+
+`$$y_t=\sum_{j=-\infty}^{\infty}a_j x_{t-j},~~~ \sum_{j=-\infty}^{\infty}|a_j| &lt; \infty.$$`
+
+---
+### Proceso lineal
+
+**Propiedad: El espectro de una serie estacionaria filtrada**
+
+Si `\(f_X(\omega)\)` es la densidad espectral de `\(x_t\)`, una serie estacionaria. Entonces, la densidad espectral `\(f_Y(\omega)\)` de la serie filtrada (output) está dada por:
+`$$f_Y(\omega)=|A(\omega)|^2 f_X(\omega),$$`
+donde 
+`$$A(\omega)=\sum_{j=-\infty}^{\infty} a_j e^{-2\pi i \omega j}$$`
+es llamada la función respuesta de frecuencia.
+
+**Nota:** `\(A(\omega)\)` es la transformada discreta de Fourier de `\(a_j\)`.
+
+
+---
+### Proceso lineal
+
+Un proceso ARMA es un caso particular de un proceso lineal. Recuerde que un proceso ARMA(p,q) se define como:
+
+`$$x_t=\phi_1 x_{t-1}+\phi_2 x_{t-2}+...+\phi_p x_{t-p}$$`
+`$$+w_t-\theta_1 w_{t-1}-\theta_2 w_{t-2}-...-\theta_q w_{t-q}$$`
+
+Utilizando los operadores de rezagos, el ARMA(p,q) se puede escribir como
+
+`$$\phi(B)x_t=\theta(B)w_t,$$`
+donde:&lt;br /&gt; 
+`\(\phi(B)=1-\phi_1 B -\phi_2  B^2-...-\phi_p B^p\)` es **el operador autoregresivo**.&lt;br /&gt; 
+`\(\theta(B)=1-\theta_1 B-\theta_2 B^2-...-\theta_q B^q\)` es **el operador de medias móviles**.
+
+---
+### Proceso lineal
+
+Un proceso ARMA(p,q) estacionario e invertible se puede escribir como:
+
+`$$x_t=\phi(B)^{-1}\theta(B)w_t,$$`
+
+**Propiedad: La densidad espectral de un modelo ARMA**
+
+
+Si `\(x_t\)` es ARMA(p,q):
+
+
+Su densidad espectral es dada por
+
+`$$f_X(\omega)=\sigma_w^2 \frac{|\theta(e^{-2 \pi i \omega})|^2}{|\phi(e^{-2 \pi i \omega})|^2}.$$`
+---
+### Ejemplos
+
+**MA(1):**
+- Considere `\(X_t=w_t+0.5 w_{t-1}\)`. 
+- El operador de medias móviles es `\(\theta(B)=1+0.5 B\)`.
+- Entonces, 
+
+
+`$$f_X(\omega)=\sigma_w^2 |\theta(e^{-2 \pi i \omega})|^2$$`
+`$$=\sigma_w^2 |1+0.5 e^{-2 \pi i \omega}|^2$$`
+`$$=\sigma_w^2 (1+0.5 e^{-2 \pi i \omega})(1+0.5 e^{2 \pi i \omega})$$`
+`$$=\sigma_w^2 \left[1.25 + 0.5 (e^{-2 \pi i \omega}+e^{2 \pi \omega})\right]$$`
+---
+### Ejemplos
+
+**AR(2):**
+- Considere `\(X_t-X_{t-1}+0.9X_{t-2}=w_t\)`. 
+- El operador autorregresivo es `\(\phi(B)=1-B+0.9 B^2\)`.
+- Entonces, 
+`$$|\phi(e^{-2 \pi i \omega})|^2=(1-e^{-2 \pi i \omega}+0.9 e^{-4 \pi i \omega})(1-e^{2 \pi i \omega}+0.9 e^{4 \pi i \omega})$$`
+`$$=2.81-3.8 cos(2\pi\omega)+1.8 cos(4\pi\omega).$$`
+- De esta forma, 
+
+`$$f_X(\omega)=\sigma_w^2 \frac{1}{2.81-3.8 cos(2\pi\omega)+1.8 cos(4\pi\omega)}.$$`
+
+---
+### Ejemplos
+
+&lt;img src="clase03_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+### Periodograma y la Transformada Discreta de Fourier
+
+- A continuación, presentamos los conceptos equivalentes de la representación espectral pero al caso de series temporales observadas de forma discreta.
+
+- Sea `\(x_1,...,x_T\)` una serie temporal observada. Defina la **Transformada Discreta de Fourier (DFT)**:
+`$$d(\omega_j)=T^{-1/2}\sum_{t=1}^T x_t e^{-2 \pi i \omega_j t},~~~ \text{para}~ j=0,1,...,T-1,$$`
+donde frecuencias `\(\omega_j=j/n\)` son llamadas frecuencias fundamentales o de Fourier.
+
+- DFT requiere `\(T^2\)` operaciones complejas. Cuando `\(T\)` es grande, es más factible usar la Transformada Rápida de Fourier (FFT), propuesta por Cooley y Tukey que requiere únicamente `\(T ln T\)` operaciones.
+
+
+---
+### Periodograma y la Transformada Discreta de Fourier
+
+- Esta transformada es una transformación lineal uno a uno, i.e.
+
+- Dada `\(x_1,...,x_T\)` una serie temporal observada. Su **Transformada Discreta de Fourier (DFT)** es dada por:
+`$$d(\omega_j)=T^{-1/2}\sum_{t=1}^T x_t e^{-2 \pi i \omega_j t},~~~ \text{para}~ j=0,1,...,T-1,$$`
+
+- Se puede definir la DFT inversa
+
+`$$x_t=T^{-1/2}\sum_{t=1}^{T-1} d(\omega_j) e^{2 \pi i \omega_j t},~~~ \text{para}~~ t=1,...,T.$$`
+---
+### Periodograma y la Transformada Discreta de Fourier
+
+- Sea `\(x_1,...,x_T\)` una serie temporal observada. Defina el **periodograma**:
+
+`$$I(\omega_j)=|d(\omega_j)|^2,~~~ \text{para}~ j=0,1,...,T-1,$$`
+- Se puede comprobar que:
+
+`$$I(\omega)=|d(\omega_j)|^2=\sum_{h=-(T-1)}^{T-1} \hat{\gamma}(h) e^{-2 \pi i \omega_j h},~~~ \text{para}~~ t= 1,...,T,$$`
+donde `\(\hat{\gamma}(h)\)` es la función de autocovariancia muestral.
+- Se puede interpretar el periodograma como la densidad espectral muestral de `\(x_t\)`.
+
+
+---
+### Propiedades del periodograma
+
+- Se puede comprobar que:
+
+`$$E[I(\omega_j)]=\sum_{h=-(T-1)}^{T-1} \frac{T-|h|}{T} \gamma(h) e^{-2 \pi i \omega_j h}.$$`
+
+- Además, cuando `\(T \rightarrow \infty\)`, 
+
+
+`$$E[I(\omega_{j:T})] \rightarrow f(\omega)=\sum_{h=-\infty}^{\infty} \gamma(h) e^{-2 \pi i h \omega},$$`
+donde `\(\omega_{j:T}=j_T/T\)` es una secuencia que tiende a `\(\omega\)`.
+
+---
+### Propiedades del periodograma
+**Propiedad: Distribución del periodograma**
+
+- Sea
+`$$x_t=\sum_{j=-\infty}^\infty \psi_j w_{t-j},~~~~~\sum_{j=-\infty}^\infty |\psi_j| &lt; \infty,$$`
+donde `\(w_t \sim iid(0,\sigma_w^2)\)`. Si `\(\sum_{h=-\infty}^\infty |h| |\gamma(h)| &lt; \infty\)`, entonces para cualquier colección de `\(m\)` frecuencias distintas `\(\omega_j \in \{0,1/2\}\)` con `\(\omega_{j:T}\rightarrow \omega_j\)`
+
+`$$\frac{2 I(\omega_{j:T})}{f(\omega_j)} \rightarrow \chi^2_2.$$`
+---
+
+- Como consecuencia, se puede construir un intervalo de confianza de `\(100(1-\alpha)\%\)`, con
+`$$\frac{2 I(\omega_{j:T})}{\chi^2_2(1-\alpha/2)}&lt;f(\omega)&lt;\frac{2 I(\omega_{j:T})}{\chi^2_2(\alpha/2)}$$`
+
+### Consideraciones importantes
+
+- En la práctica, es común encontrar series con tendencias.
+- La presencia de tendencias produce frecuencias bajas extremas que ocultan la apariencia de frecuencias altas.
+- Por lo tanto, se debe eliminar la tendencia utilizando algún método (regresión lineal, cuadrática, medias móviles, etc.)
+
+
+
+---
+### Ejemplo: El Niño y la población de peces (SOI y reclutamiento)
+
+- Se tiene la serie ambiental de índice de oscilación del sur (SOI, *Southern Oscillation Index*), y la serie de número de peces nuevos (Reclutamiento) de 453 meses de 1950 a 1987.
+- SOI mide cambios en presión relacionada a la temperatura del superficie del mar en el oceano pacífico central, el cual se calienta cada 3-7 años por el efecto El Niño.
+
+&lt;img src="clase03_files/figure-html/unnamed-chunk-4-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+### Ejemplo: SOI y reclutamiento 
+
+.pull-left[
+- El eje X muestra múltiplos de `\(\Delta=\frac{1}{12}\)`.
+- Ambos periodogramas muestran el principal pico cuando `\(\omega=1\Delta=\frac{1}{12}\)`.
+- Además, una posible potencia alrededor de `\(\omega=\frac{1}{4}\Delta=\frac{1}{48}.\)`, representando el efecto del Niño que tiene la característica de tener el ciclo irregular.
+]
+.pull-right[
+&lt;img src="clase03_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+---
+### Ejemplo: SOI y reclutamiento 
+
+```r
+head(soi.per$details) 
+```
+
+```
+##      frequency  period spectrum
+## [1,]     0.025 40.0000   0.0092
+## [2,]     0.050 20.0000   0.0497
+## [3,]     0.075 13.3333   0.0120
+## [4,]     0.100 10.0000   0.0086
+## [5,]     0.125  8.0000   0.0152
+## [6,]     0.150  6.6667   0.0338
+```
+
+
+
+```r
+tail(soi.per$details) 
+```
+
+```
+##        frequency period spectrum
+## [235,]     5.875 0.1702   0.0031
+## [236,]     5.900 0.1695   0.0049
+## [237,]     5.925 0.1688   0.0001
+## [238,]     5.950 0.1681   0.0013
+## [239,]     5.975 0.1674   0.0027
+## [240,]     6.000 0.1667   0.0074
+```
+
+- Recuerde que el dominio de frecuencia es `\((0,0.5)\)`. El gráfico muestra las frecuencias transformadas que debe multiplicar por `\(12\)`, y por lo tanto, `\((0 \times 12, 0.5 \times 12)\)`.
+
+---
+### Ejemplo: SOI y reclutamiento 
+
+- Las frecuencias más importantes:
+
+
+```r
+soi.per$details[c(10,40),] 
+```
+
+```
+##      frequency period spectrum
+## [1,]      0.25      4   0.0537
+## [2,]      1.00      1   0.9722
+```
+
+
+---
+### Ejemplo: SOI y reclutamiento 
+
+- Recordando la propiedad del periodograma, se puede construir un intervalo de confianza de `\(100(1-\alpha)\%\)`, con
+`$$\frac{2 I(\omega_{j:T})}{\chi^2_2(1-\alpha/2)}&lt;f(\omega)&lt;\frac{2 I(\omega_{j:T})}{\chi^2_2(\alpha/2)}$$`
+
+
+```r
+U = qchisq(.025,2)
+L = qchisq(.975,2)
+# para frecuencia= 1/4
+c(2*soi.per$spec[10]/L,2*soi.per$spec[10]/U)
+```
+
+```
+## [1] 0.0145653 2.1222066
+```
+
+```r
+# para frecuencia= 1
+c(2*soi.per$spec[40]/L,2*soi.per$spec[40]/U)
+```
+
+```
+## [1]  0.2635573 38.4010800
+```
+
+---
+### Ejemplo: SOI y reclutamiento 
+
+- ¡Note que el intervalo es muy amplio y **la incertidumbre es muy grande**!
+
+- De hecho, recordemos que:
+
+`$$\frac{2 I(\omega_{j:T})}{f(\omega_j)} \rightarrow \chi^2_2.$$`
+
+
+`\(\Rightarrow E\left[I(\omega)\right] \approx f(\omega)\)` y `\(Var\left[I(\omega)\right] \approx f^2(\omega)\)`.
+
+- Es decir, el periodograma no es un estimador consistente de la densidad espectral, i.e.
+
+`$$Var\left[I(\omega)\right] \nrightarrow 0 ~~\text{cuando} ~~n \rightarrow \infty.$$`
+- La solución es utilizar un **periodograma suavizado**
+
+---
+### En la próxima clase veremos
+
+
+&lt;ol start="9"&gt;
+9. Estimaciones en el dominio de frecuencia.&lt;br&gt;
+&lt;p style="margin-left: 25px;"&gt;  &amp;#9702; Estimación espectral no paramétrica &lt;/p&gt;
+&lt;p style="margin-left: 25px;"&gt;  &amp;#9702; Estimación espectral paramétrica &lt;/p&gt; &lt;br&gt;
+  
+10. Aplicaciones del análisis espectral.&lt;br&gt;
+&lt;/ol&gt;
+
+
+---
+class: center, middle
+
+## Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
