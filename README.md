@@ -23,11 +23,12 @@ curso](https://shuwei325.github.io/SP2600-I22/SP2600-programa.pdf)
 Las clases grabadas se encuentran
 [aquí](https://youtube.com/playlist?list=PL81c0Y-B3uz1Vf_SsNyqssyX6QAhphXFB)
 
-| Semana | Presentaciones                                                 | Laboratorio y Materiales extras                       |
-|--------|----------------------------------------------------------------|-------------------------------------------------------|
-| 1      | [Clase 1](https://shuwei325.github.io/SP2600-I22/clase01.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab01.R) |
-| 2      | [Clase 2](https://shuwei325.github.io/SP2600-I22/clase02.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab02.R) |
-| 3      | Semana Santa                                                   |                                                       |
-| 3      | [Clase 3](https://shuwei325.github.io/SP2600-I22/clase03.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab03.R) |
-| 4      | [Clase 4](https://shuwei325.github.io/SP2600-I22/clase04.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab04.R) |
-| 5      | [Clase 5](https://shuwei325.github.io/SP2600-I22/clase05.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab05.R) |
+| Semana | Presentaciones                                                 | Laboratorio y Materiales extras                         |
+|--------|----------------------------------------------------------------|---------------------------------------------------------|
+| 1      | [Clase 1](https://shuwei325.github.io/SP2600-I22/clase01.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab01.R)   |
+| 2      | [Clase 2](https://shuwei325.github.io/SP2600-I22/clase02.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab02.R)   |
+| 3      | Semana Santa                                                   |                                                         |
+| 3      | [Clase 3](https://shuwei325.github.io/SP2600-I22/clase03.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab03.R)   |
+| 4      | [Clase 4](https://shuwei325.github.io/SP2600-I22/clase04.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab04.R)   |
+| 5      | [Clase 5](https://shuwei325.github.io/SP2600-I22/clase05.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab05.R)   |
+| 6      | [Clase 6](https://shuwei325.github.io/SP2600-I22/clase06.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab06.rar) |
