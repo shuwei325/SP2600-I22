@@ -164,7 +164,7 @@ a_{2,t}
 X_{2,t}
 \end{bmatrix} =\begin{bmatrix}\phi_{10}\\
 \phi_{20} \end{bmatrix} + \begin{bmatrix}\phi_{1,11} &amp; 0 \\
-\phi_{21} &amp; \phi_{1,22}
+\phi_{1,21} &amp; \phi_{1,22}
 \end{bmatrix} \begin{bmatrix}X_{1,t-1}\\
 X_{2,t-1}
 \end{bmatrix}  +\begin{bmatrix}a_{1,t}\\
@@ -200,7 +200,7 @@ a_{2,t}
 - Sean:
   - `\(X_{j,t+h}|F_{t}\)`, `\(j=1,2\)` como las predicciones `\(h\)` pasos adelante basado en toda la información disponible `\(F_{t}\)` y `\(e_{j,t+h}|F_{t}\)` sus errores de pronósticos respectivos.
   - `\(X_{j,t+h}|F_{-i,t}\)`, `\(j=1,2\)` como las predicciones `\(h\)` pasos adelante basado en `\(F_{-i,t}\)` y `\(e_{j,t+h}|F_{-i,t}\)` sus errores de pronósticos respectivos.
-- Se dice que que `\(X_{t,1}\)` causa a `\(X_{t,2}\)` en el sentido de Granger, si
+- Se dice que que `\(X_{1,t}\)` causa a `\(X_{2,t}\)` en el sentido de Granger, si
 `$$Var\left(e_{2,t+h}|F_{t}\right)&lt;Var\left(e_{2,t+h}|F_{-1,t}\right)$$`
 
 - Retomando el VAR(1), con
@@ -215,14 +215,14 @@ X_{2,t-1}
 \end{bmatrix}  +\begin{bmatrix}a_{1,t}\\
 a_{2,t}
 \end{bmatrix}$$`
-- Se dice que `\(X_{t,1}\)` causa a `\(X_{t,2}\)` en el sentido de Granger si `\(\phi_{1,21} \neq 0\)`. Sin embargo, `\(X_{t,2}\)` no causa a `\(X_{t,1}\)` en el sentido de Granger.
+- Se dice que `\(X_{1,t}\)` causa a `\(X_{2,t}\)` en el sentido de Granger si `\(\phi_{1,21} \neq 0\)`. Sin embargo, `\(X_{1,t}\)` no causa a `\(X_{2,t}\)` en el sentido de Granger.
 
 ---
 ### Causalidad instantánea
 
 - Recuerden que `\(\Sigma_a\)` no necesariamente es una matriz diagonal. 
 
-- Si `\(\Sigma_a\)` no es una matriz diagonal, se dice que `\(X_{t,1}\)` y `\(X_{t,2}\)` tienen **causalidad instantánea en sentido de Granger**.
+- Si `\(\Sigma_a\)` no es una matriz diagonal, se dice que `\(X_{1,t}\)` y `\(X_{2,t}\)` tienen **causalidad instantánea en sentido de Granger**.
 
 
 
@@ -233,7 +233,7 @@ a_{2,t}
 
 `$$\left. \begin{eqnarray}X_t &amp;=&amp; \phi_1 X_{t-1}+a_t\\ 
 &amp;=&amp; \phi_1 (\phi_1 X_{t-2}+a_{t-1})+a_t \\ 
-&amp;=&amp; \phi_1^2 X_{t-2}+\phi_1 a_{t-1})+a_t \\
+&amp;=&amp; \phi_1^2 X_{t-2}+\phi_1 a_{t-1}+a_t \\
 &amp;=&amp; \phi_1^3 X_{t-3}+ \phi_1^2 a_{t-2}+\phi_1 a_{t-1}+a_t \\
 &amp;=&amp; \vdots \\
 &amp;=&amp; \phi_1^J X_{t-J}+ \sum_{j=0}^{J-1} \phi_1^j a_{t-j} \end{eqnarray}\right.$$`
@@ -447,7 +447,7 @@ m1=MTS::VAR(x,p=1)
 X_{2t}\\
 X_{3t}
 \end{bmatrix} =\begin{bmatrix}0.17\\
-0.12 \\ 0.28 \end{bmatrix} + \begin{bmatrix}0.43 &amp; 0.19 &amp;0.37 \\
+0.12 \\ 0.28 \end{bmatrix} + \begin{bmatrix}0.43 &amp; 0.19 &amp;0.04 \\
 0.19 &amp; 0.25 &amp; 0.39 \\
 0.32 &amp; 0.18 &amp; 0.17
 \end{bmatrix} \begin{bmatrix}X_{1,t-1}\\
@@ -555,7 +555,7 @@ m3=MTS::VARorder(x,maxp=15)
 - Recuerden que **el estadístico de Portmanteau multivariado** es la versión multivariada de la prueba de Ljung-Box.
 `$$Q_m=T^2 \sum_{l=1}^m \frac{1}{T-l} tr \left(\hat{R}'_l\hat{R}^{-1}_0\hat{R}_l\hat{R}^{-1}_0\right)$$`
 
-- Bajo el supuesto de `\(H_0\)`,i.e. `\(R_l=0,~ l&gt;0\)`, y `\(X_t\)` es distribuída normalmente, para `\(T\)` y `\(l\)` suficientemente grandes, el estadístico se aproxima a la distribución `\(\chi^2_{mk^2}\)`.
+- Bajo el supuesto de `\(H_0\)`,i.e. `\(R_l=0,~ l&gt;0\)`, y `\(X_t\)` es distribuída normalmente, para `\(T\)` y `\(m\)` suficientemente grandes, el estadístico se aproxima a la distribución `\(\chi^2_{mk^2}\)`.
 
 - Para el caso de un VAR(p) se deben corregir los grados de libertad, es decir, `\(\chi^2_{(m-p)k^2}\)`, i.e. el valor de corrección es `\(pk^2\)`.
 
