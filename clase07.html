@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Series de tiempo II - Tópicos avanzados</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Shu Wei Chou C." />
+    <script src="clase07_files/header-attrs/header-attrs.js"></script>
+    <link href="clase07_files/remark-css/robot-fonts.css" rel="stylesheet" />
+    <link href="clase07_files/remark-css/robot.css" rel="stylesheet" />
+    <link href="clase07_files/remark-css/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Series de tiempo II - Tópicos avanzados
+## (PF-1360 y SP-2600)
+### Prof. Shu Wei Chou C.
+### Posgrado en Matemática - Posgrado en Estadística, UCR
+### 24-05-2022
+
+---
+
+
+
+
+
+
+
+### Tema II
+
+### Análisis multivariado de series temporales
+
+En las clases anteriores vimos:
+
+1. Introducción
+2. Modelos ARMA vectoriales
+
+---
+### Contenido
+
+&lt;ol start="10"&gt;
+
+2. Modelos ARMA vectoriales &lt;br&gt;
+3. Causalidad de Granger &lt;br&gt;
+4. Raíz unitarias &lt;br&gt;
+5. Procesos cointegrados: definición y pruebas de hipótesis para cointegración y modelos de corrección del error. &lt;br&gt;
+&lt;/ol&gt;
+
+---
+### VARX(p)
+
+- Vamos a enfocar en el modelo VAR(p) con posibilidad de incluir covariables (variables exógenas):
+
+`$$X_{t}=CD_t+\phi_1 X_{t-1}+...+\phi_pX_{t-p}+a_{t}$$`
+donde `\(\phi_0\)` es un vector de dimensión `\(k\)`, `\(\phi_i\)` matrices `\(k \times k\)` para `\(i=1,...,p\)`, `\(\phi_p \neq 0\)` y `\(a_t\)` es una secuencia de i.i.d. vectores aleatorios con media 0 y matriz de covariancias `\(\Sigma_a\)`, que es definida positiva, `\(C\)` es la matriz de coeficientes de dimiensión `\((k \times M)\)` y `\(D_t\)` es el vector columna de variables exógenas `\((M \times 1)\)`.
+
+- Su representación con el operador autorregresivo.
+`$$\phi(B) X_{t}=CD_t+a_{t}$$`
+donde `\(\phi(B)=I_k- \phi_1 B-...- \phi_p B^p\)` es el operador autorregresivo.
+
+- Si las soluciones de `\(|\phi(B)|\)`, están fuera del círculo unitario, entonces VARX(p) es estacionario.
+
+---
+### VARX(1) 
+
+- VARX(1) con 3 series tepmorales y variables exógenas: intercepto y tendencia.
+
+`$$X_{t}=C D_t+\phi X_{t-1}+a_{t},$$`
+
+`$$\text{donde}~~ C=\begin{bmatrix}\alpha_{1} &amp; \beta_{1}  \\
+\alpha_{2} &amp; \beta_{2} \\
+\alpha_{3} &amp; \beta_{3}
+\end{bmatrix} ~~\text{y}~~ D_t= \begin{bmatrix}1  \\
+t \end{bmatrix}$$`
+
+- Es decir,
+
+`$$X_{1,t}=\alpha_1 + \beta_1 t+\phi_{11}X_{1,t-1}+\phi_{12}X_{2,t-1}+\phi_{13}X_{3,t-1}+a_{1,t}$$`
+
+`$$X_{2,t}=\alpha_2+ \beta_2 t+\phi_{21}X_{1,t-1}+\phi_{22}X_{2,t-1}+\phi_{23}X_{3,t-1}+a_{2,t}$$`
+
+`$$X_{3,t}=\alpha_3+ \beta_3 t+\phi_{31}X_{1,t-1}+\phi_{32}X_{2,t-1}+\phi_{33}X_{3,t-1}+a_{3,t}$$`
+
+---
+### Causalidad de Granger de un VAR(1)
+
+- Considere el modelo VAR(1):
+
+`$$X_{t}=\phi_0+\phi_1 X_{t-1} + a_{t}$$`
+- Expresando explícitamente la ecuación,
+
+`$$\begin{bmatrix}X_{1,t}\\
+X_{2,t}
+\end{bmatrix} =\begin{bmatrix}\phi_{10}\\
+\phi_{20} \end{bmatrix} + \begin{bmatrix}\phi_{1,11} &amp; \phi_{1,12} \\
+\phi_{1,21} &amp; \phi_{1,22}
+\end{bmatrix} \begin{bmatrix}X_{1,t-1}\\
+X_{2,t-1}
+\end{bmatrix}  +\begin{bmatrix}a_{1,t}\\
+a_{2,t}
+\end{bmatrix}$$`
+
+- o bien,
+
+`$$X_{1,t}=\phi_{10}+\phi_{1,11}X_{t-1,1}+\phi_{1,12}X_{t-1,2}+a_{1,t}$$`
+
+`$$X_{2,t}=\phi_{20}+\phi_{1,21}X_{t-1,1}+\phi_{1,22}X_{t-1,2}+a_{2,t}$$`
+- Habíamos discutido que `\(X_{1,t}\)` causa a `\(X_{2,t}\)` en el sentido de Granger si `\(\phi_{1,21} \neq 0\)`.
+
+
+---
+### Causalidad de Granger de un VARX(p)
+
+- Recordemos que el modelo VARX(p) se puede representar por:
+
+`$$X_{t}=CD_t+ \sum_{i=1}^p \phi_i X_{t-i}+a_{t}$$`
+- Podemos representar este modelo por bloques. Considere dos subvectores de `\(X_t\)`, i.e. `\(X_t=(\dot{X}_{1,t},\dot{X}_{2,t})\)` donde `\(\dot{X}_{1,t}\)` de dimensión `\(k_1\)` y `\(\dot{X}_{2,t}\)` de dimensión `\(k_2\)` y `\(k=k_1+k_2\)`.
+
+`$$\begin{bmatrix}\dot{X}_{1,t}\\
+\dot{X}_{2,t}
+\end{bmatrix} = CD_t + \sum_{i=1}^p \begin{bmatrix}\Phi_{i,11} &amp; \Phi_{i,12} \\
+\Phi_{i,21} &amp; \Phi_{i,22}
+\end{bmatrix} \begin{bmatrix}\dot{X}_{1,t-i}\\
+\dot{X}_{2,t-i}
+\end{bmatrix}  +\begin{bmatrix}\dot{a}_{1,t}\\
+\dot{a}_{2,t}
+\end{bmatrix}$$`
+
+- Note que ahora los elementos de la matriz de coeficientes `\(\Phi_{i,12},\Phi_{i,12},\Phi_{i,21},\Phi_{i,22},~i=1,...,p\)` son matrices también.
+
+---
+### Causalidad de Granger de VAR(1) con `\(k=3\)`
+
+
+`$$\begin{bmatrix}X_{1,t}\\
+X_{2,t}\\
+X_{3,t}
+\end{bmatrix}=\begin{bmatrix}\alpha_{1}\\
+\alpha_{2}\\
+\alpha_{3}
+\end{bmatrix}+\begin{bmatrix}\phi_{1,11} &amp; \phi_{1,12} &amp; \phi_{1,13} \\
+\phi_{1,21} &amp; \phi_{1,22} &amp; \phi_{1,23}\\
+\phi_{1,31} &amp; \phi_{1,32} &amp; \phi_{1,33}
+\end{bmatrix} \begin{bmatrix}X_{1,t-1}\\
+X_{2,t-1}\\
+X_{3,t-1}
+\end{bmatrix}+a_{t}$$`
+- Suponga que nos interesa ver la causalidad de Granger entre `\(X_{1,t}\)` y `\((X_{2,t},X_{3,t})\)`, i.e. `\(X_t=(\dot{X}_{1,t},\dot{X}_{2,t})\)` donde `\(\dot{X}_{1,t}=X_{1,t}\)` y `\(\dot{X}_{2,t}=(X_{2,t},X_{3,t})\)` con `\(k_1=1\)` y `\(k_2=2\)`.
+- En este caso,
+
+`$$\Phi_{1,11}=\left[\phi_{1,11}\right],~~\Phi_{1,12}=\left[\phi_{1,12},\phi_{1,13}\right]$$`     `$$\Phi_{1,21}=\begin{bmatrix}\phi_{1,21}\\ \phi_{1,31} \end{bmatrix},~~~\Phi_{1,22}=\begin{bmatrix} \phi_{1,22} &amp; \phi_{1,23}\\ \phi_{1,32} &amp; \phi_{1,33}\end{bmatrix}$$`
+
+---
+### Causalidad de Granger
+
+`$$\begin{bmatrix}\dot{X}_{1t}\\
+\dot{X}_{2t}
+\end{bmatrix} = CD_t + \sum_{i=1}^p \begin{bmatrix}\Phi_{i,11} &amp; \Phi_{i,12} \\
+\Phi_{i,21} &amp; \Phi_{i,22}
+\end{bmatrix} \begin{bmatrix}\dot{X}_{1,t-i}\\
+\dot{X}_{2,t-i}
+\end{bmatrix}  +\begin{bmatrix}a_{1t}\\
+a_{2t}
+\end{bmatrix}$$`
+- Para probar la hipótesis de que el subvector `\(\dot{X}_{1t}\)` no cause a `\(\dot{X}_{2t}\)` en el sentido de Granger sería probar:
+
+`\(H_0:\Phi_{i,21}=0\)` para todo `\(i=1,...,p\)`    
+`\(H_1:\Phi_{i,21} \neq 0\)` para algún `\(i=1,...,p\)`.
+
+- Considere `\(\beta\)` el conjunto de todos los parámetros de interés, i.e. todos los elementos de `\(\left[\phi_1,...,\phi_p,C\right]\)`, podemos escribir las restricciones en la siguiente ecuación
+`$$\Gamma \beta=c$$`
+en donde `\(\Gamma\)` es una matriz `\((N \times (k^2p+kM))\)`.
+
+
+
+---
+### Causalidad de Granger
+
+
+- Para probar la causalidad de Granger, se utiliza el estadístico de Wald para probar la hipótesis. Este estadístico tiene una distribución asintótica de `\(F(pk_1k_2,kT-n^*)\)` donde `\(n^*\)` es la cantidad total de parámetros del modelo.
+
+- Por otro lado, para probar la causalidad instantánea, se utiliza el estadístico Wald pero con las hipótesis planteadas de la siguiente forma:    
+`\(H_0:\Gamma \Sigma_a=c\)`     
+`\(H_1:\Gamma \Sigma_a \neq c\)`.   
+donde `\(\Gamma\)` es una matriz `\((N \times K(K+1)/2)\)`
+
+- En este caso, el estadístico tiene una distribución asintótica de `\(\chi_{N}^2\)`.
+
+---
+### Ejemplo simulado
+
+- Considere una realización de `\(T=1000\)` de un VAR(1):
+
+`$$\begin{bmatrix}X_{1t}\\
+X_{2t}
+\end{bmatrix} =\begin{bmatrix}5\\
+10 \end{bmatrix} + \begin{bmatrix} 0.5 &amp; 0.3 \\
+0 &amp; -0.5
+\end{bmatrix} \begin{bmatrix}X_{1,t-1}\\
+X_{2,t-1}
+\end{bmatrix}  +\begin{bmatrix}a_{1t}\\
+a_{2t}
+\end{bmatrix}$$`
+donde `\(a_t \sim N(0,\Sigma_a)\)` con `\(\Sigma_a=I_2\)`.
+
+&lt;img src="clase07_files/figure-html/unnamed-chunk-2-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+### Ejemplo simulado
+
+
+&lt;img src="clase07_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+
+---
+### Ejemplo simulado
+
+
+```r
+infocrit &lt;- VARselect(vardat, lag.max = 5,
+                      type = "const")
+infocrit
+```
+
+```
+## $selection
+## AIC(n)  HQ(n)  SC(n) FPE(n) 
+##      1      1      1      1 
+## 
+## $criteria
+##                 1          2          3          4          5
+## AIC(n) 0.01663971 0.02359745 0.02962560 0.03942986 0.04167949
+## HQ(n)  0.03664660 0.05694227 0.07630834 0.09945052 0.11503808
+## SC(n)  0.06760405 0.10853801 0.14854239 0.19232287 0.22854873
+## FPE(n) 1.01677922 1.02387948 1.03007269 1.04022587 1.04257554
+```
+
+---
+### Ejemplo simulado
+
+
+```r
+varsimest &lt;- vars::VAR(vardat, p = 1, type = "const",
+                 season = NULL, exogen = NULL)
+roots &lt;- vars::roots(varsimest)
+roots
+```
+
+```
+## [1] 0.5599037 0.5593191
+```
+
+- Los módulos de los autovalores son menores a 1.
+
+
+---
+### Ejemplo simulado: Diagnósticos
+
+
+```r
+(var2c.serial &lt;- serial.test(varsimest, lags.pt = 16, type = "PT.asymptotic"))
+```
+
+```
+## 
+## 	Portmanteau Test (asymptotic)
+## 
+## data:  Residuals of VAR object varsimest
+## Chi-squared = 40.221, df = 60, p-value = 0.9768
+```
+
+```r
+(var2c.arch &lt;- arch.test(varsimest, lags.multi = 5, multivariate.only = TRUE))
+```
+
+```
+## 
+## 	ARCH (multivariate)
+## 
+## data:  Residuals of VAR object varsimest
+## Chi-squared = 40.218, df = 45, p-value = 0.6744
+```
+
+```r
+(var2c.norm &lt;- normality.test(varsimest, multivariate.only = TRUE))
+```
+
+```
+## $JB
+## 
+## 	JB-Test (multivariate)
+## 
+## data:  Residuals of VAR object varsimest
+## Chi-squared = 1.9268, df = 4, p-value = 0.7492
+## 
+## 
+## $Skewness
+## 
+## 	Skewness only (multivariate)
+## 
+## data:  Residuals of VAR object varsimest
+## Chi-squared = 1.5367, df = 2, p-value = 0.4638
+## 
+## 
+## $Kurtosis
+## 
+## 	Kurtosis only (multivariate)
+## 
+## data:  Residuals of VAR object varsimest
+## Chi-squared = 0.39006, df = 2, p-value = 0.8228
+```
+
+
+---
+### Ejemplo simulado: Diagnósticos
+
+.pull-left[
+- Para `\(\hat{a}_1\)`
+&lt;img src="clase07_files/figure-html/unnamed-chunk-7-1.png" width="120%" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+- Para `\(\hat{a}_2\)`
+&lt;img src="clase07_files/figure-html/unnamed-chunk-8-1.png" width="120%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Ejemplo simulado: Causalidad de Granger
+
+
+```r
+(var.causal.x1&lt;- causality(varsimest,cause="x2"))
+```
+
+```
+## $Granger
+## 
+## 	Granger causality H0: x2 do not Granger-cause x1
+## 
+## data:  VAR object varsimest
+## F-Test = 98.076, df1 = 1, df2 = 992, p-value &lt; 2.2e-16
+## 
+## 
+## $Instant
+## 
+## 	H0: No instantaneous causality between: x2 and x1
+## 
+## data:  VAR object varsimest
+## Chi-squared = 0.47883, df = 1, p-value = 0.489
+```
+
+---
+### Ejemplo simulado: Causalidad de Granger
+
+
+```r
+(var.causal.x2&lt;- causality(varsimest,cause="x1"))
+```
+
+```
+## $Granger
+## 
+## 	Granger causality H0: x1 do not Granger-cause x2
+## 
+## data:  VAR object varsimest
+## F-Test = 2.0672, df1 = 1, df2 = 992, p-value = 0.1508
+## 
+## 
+## $Instant
+## 
+## 	H0: No instantaneous causality between: x1 and x2
+## 
+## data:  VAR object varsimest
+## Chi-squared = 0.47883, df = 1, p-value = 0.489
+```
+
+
+---
+### Pronóstico
+
+- Dadas las observaciones `\(X_1,...,X_T\)`, el pronóstico `\(h\)` pasos para frente, `\(X_{T+h}\)` es dado por
+
+`$$X_{T}(h)=CD_{T+h}+\phi_1 X_{T+h-1}+...+\phi_pX_{T+h-p},$$`
+donde `\(X_{T}(j)=X_{T+j}\)` para `\(j\leq 0\)`.
+
+- El error de pronóstico de `\(h\)` pasos para frente es dado por
+`$$e_h(h)=X_{T+h}-X_{T}(h)$$`
+
+- El cálculo del error de pronóstico de `\(X_{T}(h)\)` es más conveniente usar la representación de MA, y el error de pronóstico es dado por
+
+`$$X_{T}(h)= a_{T+h} + \phi_1 a_{T+h-1}+...+\phi_{h-1} a_{T+1},$$`
+
+---
+### Ejemplo
+
+
+&lt;img src="clase07_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+### El análisis del impulso-respuesta.
+
+- Para cualquier modelo VAR(p) estacionario, tiene la representación de MA:
+
+`$$X_{t}= \theta_0 a_{t}+\theta_1 a_{t-1}+ \theta_{2} a_{t-2}+...$$`
+- Se interpreta como una regresión en donde cada entrada `\((i,j)\)` de `\(\theta_m,~m=1,...\)` representa el cambio del valor esperado de `\(X_{j}\)` bajo un cambio de una unidad de `\(X_i\)`.
+
+- Por ejemplo, para el modelo: 
+
+`$$\begin{bmatrix}X_{1t}\\
+X_{2t}
+\end{bmatrix} = \begin{bmatrix}\theta_{0,11} &amp; \theta_{0,12} \\
+\theta_{0,21} &amp; \theta_{0,22}
+\end{bmatrix} \begin{bmatrix}a_{1,t}\\
+a_{2,t}
+\end{bmatrix}  +\begin{bmatrix}\theta_{1,11} &amp; \theta_{1,12} \\
+\theta_{1,21} &amp; \theta_{1,22}
+\end{bmatrix} \begin{bmatrix}a_{1,t-1}\\
+a_{2,t-1}
+\end{bmatrix}+\dots$$`
+
+`\(\theta_{1,21}\)` representa el cambio del valor esperado de `\(X_{2,t+1}\)` bajo un cambio de una unidad de `\(X_{1,t}\)`.   
+`\(\theta_{1,12}\)` representa el cambio del valor esperado de `\(X_{1,t+1}\)` bajo un cambio de una unidad de `\(X_{2,t}\)`.   
+ 
+ 
+ 
+---
+### Ejemplo
+
+.pull-left[
+&lt;img src="clase07_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="clase07_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+### Ejemplo: series macroeconómicas en Canada
+
+- Se tienen 4 series de primer trimestre de 1980 al cuarto trimestre de 2000. Se puede interpretar las series como:
+  - *prod*: productividad laboral
+  - *e*: tasa de empleo
+  - *U*: tasa de desempleo
+  - *rw*: salario real
+- Se ajusta un VAR(2) con tendencia.
+&lt;img src="clase07_files/figure-html/unnamed-chunk-14-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+### Ejemplo: series macroeconómicas en Canada
+
+**Predicciones**:
+
+.pull-left[
+&lt;img src="clase07_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="clase07_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+### Procesos integrados
+
+Considere una serie **univariada** `\(X_t\)`. 
+
+**Definición:** Si `\(\nabla^d X_t\)` es estacionario, decimos que `\(X_t\)` es integrado de orden `\(d\)`, y es denotado por `\(X_t \sim I(d)\)`.
+
+- Ejemplo: Si `\(\nabla^d X_t \sim ARMA(p,q)\)`, decimos que `\(X_t\)` es ARIMA(p,d,q).
+
+- Ejemplo: Cualquier serie temporal estacionaria es `\(I(0)\)`.
+
+Recuerde la diferenciación estacional `\(\nabla_s^D X_t=(1-B^s)^D X_t\)`
+
+**Definición:** Si `\(\nabla^d \nabla_s^D X_t\)` es estacionario, decimos que `\(X_t\)` es estacionalmente integrado de orden `\(d\)` y `\(D\)`, y es denotado por `\(X_t \sim I(d,D)\)`.
+
+Ejemplo: Si `\(\nabla^d \nabla_s^D X_t \sim ARMA(p,q)\)`, entonces `\(X_t\)` es `\(SARIMA(p,d,q)(0,D,0)_s\)`.
+
+
+---
+### Serie estacionaria por tendencia y por diferencia.
+
+Suponga que una serie temporal `\(\left\lbrace X_t \right\rbrace\)` es una realización de una tendencia determinística y un componente estocástico:
+
+$$
+X_t=CD_t+ \eta_t,
+$$
+donde `\(CD_t=\beta_0+\beta_1 t\)` y `\(\eta_t \sim ARMA(p,q)\)` que no necesariamente es estacionario e invertible, i.e., tiene su representación 
+`$$\phi(B)\eta_t=\theta(B)\epsilon_t$$`
+
+**Caso 1:** Si todas las raíces de `\(\phi(B)\)` están fuera del circulo unitario, `\(\left\lbrace X_t \right\rbrace\)` es estacionaria alrededor de una tendencia determinística. Por lo tanto, se puede eliminar la tendencia de la serie original y ajustar un modelo ARMA a los residuales. Este caso se dice que el modelo es **estacionario por tendencia** (*trend-stationary*).
+
+
+---
+### Serie estacionaria por tendencia y por diferencia.
+
+Suponga que una serie temporal `\(\left\lbrace X_t \right\rbrace\)` es una realización de una tendencia determinística y un componente estocástico:
+
+$$
+X_t=CD_t+ \eta_t,
+$$
+donde `\(CD_t=\beta_0+\beta_1 t\)` y `\(\eta_t \sim ARMA(p,q)\)` que no necesariamente es estacionario e invertible, i.e., tiene su representación 
+`$$\phi(B)\eta_t=\theta(B)\epsilon_t$$`
+
+**Caso 2:** si existe una raíz que está exactamente en el círculo unitario y el resto de las raíces están fuera del círculo unitario, i.e. `\(\phi(B)=(1-B)\phi^*(B)\)`, y `\(\phi^*(B)\eta_t\)` es estacionario. Por lo tanto, `\(\left\lbrace X_t \right\rbrace\)` es estacionaria por diferencia. Por lo tanto, se puede realizar diferenciación para obtener una serie estacionaria. Caso más común es cuando `\(d=1\)`. Este caso se dice que el modelo es **estacionario por diferencia** (*difference-stationary*).
+
+
+---
+### Serie estacionaria por tendencia y por diferencia.
+
+Note que el componente del error es `\(I(1)\)`, i.e. ARIMA(p,1,q):
+`$$\phi^*(B)(1-B)\eta_t=\theta(B)\epsilon_t$$`
+Si aplicamos la diferenciación a
+$$
+X_t=\beta_0+\beta_1 t+ \eta_t,
+$$
+Tenemos
+
+`$$X_t-X_{t-1}=\beta_0+\beta_1 t+ \eta_t - [\beta_0+\beta_1 (t-1)+ \eta_{t-1}]$$`
+`$$=\beta_1  + [\eta_t-\eta_{t-1}]$$`
+y es estacionario.
+
+---
+### Ejemplo: Tendencia determinística y estocástica
+
+ 
+&lt;img src="clase07_files/figure-html/unnamed-chunk-17-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+### Ejemplo: Tendencia determinística y estocástica
+
+
+```r
+trend &lt;- seq_along(austa)
+(fit1 &lt;- auto.arima(austa, d=0, xreg=trend))
+```
+
+```
+## Series: austa 
+## Regression with ARIMA(2,0,0) errors 
+## 
+## Coefficients:
+##          ar1      ar2  intercept    xreg
+##       1.1127  -0.3805     0.4156  0.1710
+## s.e.  0.1600   0.1585     0.1897  0.0088
+## 
+## sigma^2 estimated as 0.02979:  log likelihood=13.6
+## AIC=-17.2   AICc=-15.2   BIC=-9.28
+```
+
+`$$X_t=0.416+0.171t+\eta_t$$`
+`$$\eta_t=1.113\eta_{t-1}-0.380 \eta_{t-2}+\epsilon_t$$`
+`$$\epsilon_t \overset{iid}{\sim} N(0,0.03)$$`
+
+
+---
+### Ejemplo: Tendencia determinística y estocástica
+
+
+```r
+(fit2 &lt;- auto.arima(austa, d=1))
+```
+
+```
+## Series: austa 
+## ARIMA(0,1,1) with drift 
+## 
+## Coefficients:
+##          ma1   drift
+##       0.3006  0.1735
+## s.e.  0.1647  0.0390
+## 
+## sigma^2 estimated as 0.03376:  log likelihood=10.62
+## AIC=-15.24   AICc=-14.46   BIC=-10.57
+```
+
+`$$X_t-X_{t-1}=0.173+\eta'_t,$$`
+o de otra forma,
+
+`$$X_t=X_0+0.173t+\eta_t$$`
+`$$\eta_t=\eta_{t-1}+0.301\epsilon_{t-1}+\epsilon_t$$`
+`$$\epsilon_t \overset{iid}{\sim} N(0,0.034)$$`
+
+
+---
+### Tendencia determinística y estocástica
+
+
+&lt;img src="clase07_files/figure-html/unnamed-chunk-20-1.png" width="700px" height="500px" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+### Serie estacionaria por tendencia y por diferencia.
+
+- Ejemplo de estos dos tipos de estacionariedad:
+
+**Tendencia determinística:**
+`$$X_t=X_{t-1}+\mu=X_0+\mu t$$`
+**Tendencia estocástica (acumulación de choques aleatorias):**
+`$$X_t=X_{t-1}+\epsilon_t=X_0+\sum_{s=1}^t \epsilon_s$$`
+donde `\(\mu\)` es una constante y `\(\epsilon_t\)` es ruido blanco.
+
+
+---
+### Serie estacionaria por tendencia y por diferencia.
+
+- En síntesis, una serie temporal `\(\left\lbrace X_t \right\rbrace\)` está compuesto por una tendencia determinística y un componente estocástico que es modelado por `\(ARIMA(p,d,q)\)`.
+- Se puede descomponer `\(\eta_t\)` en dos componentes: tendencia estocástica (choques aleatorios) y el componente aleatorio "estacionario". 
+- Entonces, `\(\left\lbrace X_t \right\rbrace\)` se puede descomponer en tres componentes:
+1. tendencia determinística,
+2. tendencia estocástica, y
+3. el componente "aleatorio".
+
+- Un modelo estacionario por tendencia, no tiene la tendencia estocástica, y el componente aleatorio es `\(ARMA(p,q)\)`.
+- En el caso de un modelo estacionario por diferencia, el polinomio autoregresivo del componente `\(\eta_t\)` tiene al menos una raíz unitaria.
+
+
+---
+### Serie estacionaria por tendencia y por diferencia.
+
+.pull-left[
+
+&lt;img src="clase07_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+
+&lt;img src="clase07_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+### En la próxima clase veremos
+
+
+
+&lt;ol start="9"&gt;
+5. Procesos cointegrados: definición y pruebas de hipótesis para cointegración y modelos de corrección del error. &lt;br&gt;
+&lt;/ol&gt;
+
+
+
+---
+
+class: center, middle
+
+## Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
