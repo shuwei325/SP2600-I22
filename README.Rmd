@@ -31,7 +31,7 @@ Semana        | Presentaciones | Laboratorio y Materiales extras
 4             | [Clase 4](https://shuwei325.github.io/SP2600-I22/clase04.html)|[lab](https://shuwei325.github.io/SP2600-I22/lab04.R)  
 5             | [Clase 5](https://shuwei325.github.io/SP2600-I22/clase05.html)|[lab](https://shuwei325.github.io/SP2600-I22/lab05.R)  
 6             | [Clase 6](https://shuwei325.github.io/SP2600-I22/clase06.html)|[lab](https://shuwei325.github.io/SP2600-I22/lab06.rar)  
-7             | [Clase 6](https://shuwei325.github.io/SP2600-I22/clase07.html)|[lab](https://shuwei325.github.io/SP2600-I22/lab07.R)  
+7             | [Clase 7](https://shuwei325.github.io/SP2600-I22/clase07.html)|[lab](https://shuwei325.github.io/SP2600-I22/lab07.R)  
 
 
 
