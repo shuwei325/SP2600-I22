@@ -229,11 +229,11 @@ infocrit
 ##      1      1      1      1 
 ## 
 ## $criteria
-##                 1          2          3          4          5
-## AIC(n) 0.01663971 0.02359745 0.02962560 0.03942986 0.04167949
-## HQ(n)  0.03664660 0.05694227 0.07630834 0.09945052 0.11503808
-## SC(n)  0.06760405 0.10853801 0.14854239 0.19232287 0.22854873
-## FPE(n) 1.01677922 1.02387948 1.03007269 1.04022587 1.04257554
+##                   1           2            3           4           5
+## AIC(n) -0.026459102 -0.01789708 -0.003376774 0.003769214 0.009856093
+## HQ(n)  -0.006452213  0.01544773  0.043305965 0.063789879 0.083214683
+## SC(n)   0.024505235  0.06704348  0.115540011 0.156662224 0.196725327
+## FPE(n)  0.973888163  0.98226347  0.996632679 1.003784373 1.009919605
 ```
 
 ---
@@ -248,7 +248,7 @@ roots
 ```
 
 ```
-## [1] 0.5599037 0.5593191
+## [1] 0.4993944 0.4877665
 ```
 
 - Los módulos de los autovalores son menores a 1.
@@ -267,7 +267,7 @@ roots
 ## 	Portmanteau Test (asymptotic)
 ## 
 ## data:  Residuals of VAR object varsimest
-## Chi-squared = 40.221, df = 60, p-value = 0.9768
+## Chi-squared = 71.233, df = 60, p-value = 0.1521
 ```
 
 ```r
@@ -279,7 +279,7 @@ roots
 ## 	ARCH (multivariate)
 ## 
 ## data:  Residuals of VAR object varsimest
-## Chi-squared = 40.218, df = 45, p-value = 0.6744
+## Chi-squared = 40.273, df = 45, p-value = 0.6721
 ```
 
 ```r
@@ -292,7 +292,7 @@ roots
 ## 	JB-Test (multivariate)
 ## 
 ## data:  Residuals of VAR object varsimest
-## Chi-squared = 1.9268, df = 4, p-value = 0.7492
+## Chi-squared = 5.5421, df = 4, p-value = 0.2361
 ## 
 ## 
 ## $Skewness
@@ -300,7 +300,7 @@ roots
 ## 	Skewness only (multivariate)
 ## 
 ## data:  Residuals of VAR object varsimest
-## Chi-squared = 1.5367, df = 2, p-value = 0.4638
+## Chi-squared = 1.1041, df = 2, p-value = 0.5758
 ## 
 ## 
 ## $Kurtosis
@@ -308,7 +308,7 @@ roots
 ## 	Kurtosis only (multivariate)
 ## 
 ## data:  Residuals of VAR object varsimest
-## Chi-squared = 0.39006, df = 2, p-value = 0.8228
+## Chi-squared = 4.438, df = 2, p-value = 0.1087
 ```
 
 
@@ -339,7 +339,7 @@ roots
 ## 	Granger causality H0: x2 do not Granger-cause x1
 ## 
 ## data:  VAR object varsimest
-## F-Test = 98.076, df1 = 1, df2 = 992, p-value &lt; 2.2e-16
+## F-Test = 17.191, df1 = 1, df2 = 992, p-value = 3.669e-05
 ## 
 ## 
 ## $Instant
@@ -347,7 +347,7 @@ roots
 ## 	H0: No instantaneous causality between: x2 and x1
 ## 
 ## data:  VAR object varsimest
-## Chi-squared = 0.47883, df = 1, p-value = 0.489
+## Chi-squared = 2.8189, df = 1, p-value = 0.09316
 ```
 
 ---
@@ -364,7 +364,7 @@ roots
 ## 	Granger causality H0: x1 do not Granger-cause x2
 ## 
 ## data:  VAR object varsimest
-## F-Test = 2.0672, df1 = 1, df2 = 992, p-value = 0.1508
+## F-Test = 1.2916, df1 = 1, df2 = 992, p-value = 0.256
 ## 
 ## 
 ## $Instant
@@ -372,7 +372,7 @@ roots
 ## 	H0: No instantaneous causality between: x1 and x2
 ## 
 ## data:  VAR object varsimest
-## Chi-squared = 0.47883, df = 1, p-value = 0.489
+## Chi-squared = 2.8189, df = 1, p-value = 0.09316
 ```
 
 
@@ -461,190 +461,6 @@ a_{2,t-1}
 &lt;img src="clase07_files/figure-html/unnamed-chunk-16-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
-
-
----
-### Procesos integrados
-
-Considere una serie **univariada** `\(X_t\)`. 
-
-**Definición:** Si `\(\nabla^d X_t\)` es estacionario, decimos que `\(X_t\)` es integrado de orden `\(d\)`, y es denotado por `\(X_t \sim I(d)\)`.
-
-- Ejemplo: Si `\(\nabla^d X_t \sim ARMA(p,q)\)`, decimos que `\(X_t\)` es ARIMA(p,d,q).
-
-- Ejemplo: Cualquier serie temporal estacionaria es `\(I(0)\)`.
-
-Recuerde la diferenciación estacional `\(\nabla_s^D X_t=(1-B^s)^D X_t\)`
-
-**Definición:** Si `\(\nabla^d \nabla_s^D X_t\)` es estacionario, decimos que `\(X_t\)` es estacionalmente integrado de orden `\(d\)` y `\(D\)`, y es denotado por `\(X_t \sim I(d,D)\)`.
-
-Ejemplo: Si `\(\nabla^d \nabla_s^D X_t \sim ARMA(p,q)\)`, entonces `\(X_t\)` es `\(SARIMA(p,d,q)(0,D,0)_s\)`.
-
-
----
-### Serie estacionaria por tendencia y por diferencia.
-
-Suponga que una serie temporal `\(\left\lbrace X_t \right\rbrace\)` es una realización de una tendencia determinística y un componente estocástico:
-
-$$
-X_t=CD_t+ \eta_t,
-$$
-donde `\(CD_t=\beta_0+\beta_1 t\)` y `\(\eta_t \sim ARMA(p,q)\)` que no necesariamente es estacionario e invertible, i.e., tiene su representación 
-`$$\phi(B)\eta_t=\theta(B)\epsilon_t$$`
-
-**Caso 1:** Si todas las raíces de `\(\phi(B)\)` están fuera del circulo unitario, `\(\left\lbrace X_t \right\rbrace\)` es estacionaria alrededor de una tendencia determinística. Por lo tanto, se puede eliminar la tendencia de la serie original y ajustar un modelo ARMA a los residuales. Este caso se dice que el modelo es **estacionario por tendencia** (*trend-stationary*).
-
-
----
-### Serie estacionaria por tendencia y por diferencia.
-
-Suponga que una serie temporal `\(\left\lbrace X_t \right\rbrace\)` es una realización de una tendencia determinística y un componente estocástico:
-
-$$
-X_t=CD_t+ \eta_t,
-$$
-donde `\(CD_t=\beta_0+\beta_1 t\)` y `\(\eta_t \sim ARMA(p,q)\)` que no necesariamente es estacionario e invertible, i.e., tiene su representación 
-`$$\phi(B)\eta_t=\theta(B)\epsilon_t$$`
-
-**Caso 2:** si existe una raíz que está exactamente en el círculo unitario y el resto de las raíces están fuera del círculo unitario, i.e. `\(\phi(B)=(1-B)\phi^*(B)\)`, y `\(\phi^*(B)\eta_t\)` es estacionario. Por lo tanto, `\(\left\lbrace X_t \right\rbrace\)` es estacionaria por diferencia. Por lo tanto, se puede realizar diferenciación para obtener una serie estacionaria. Caso más común es cuando `\(d=1\)`. Este caso se dice que el modelo es **estacionario por diferencia** (*difference-stationary*).
-
-
----
-### Serie estacionaria por tendencia y por diferencia.
-
-Note que el componente del error es `\(I(1)\)`, i.e. ARIMA(p,1,q):
-`$$\phi^*(B)(1-B)\eta_t=\theta(B)\epsilon_t$$`
-Si aplicamos la diferenciación a
-$$
-X_t=\beta_0+\beta_1 t+ \eta_t,
-$$
-Tenemos
-
-`$$X_t-X_{t-1}=\beta_0+\beta_1 t+ \eta_t - [\beta_0+\beta_1 (t-1)+ \eta_{t-1}]$$`
-`$$=\beta_1  + [\eta_t-\eta_{t-1}]$$`
-y es estacionario.
-
----
-### Ejemplo: Tendencia determinística y estocástica
-
- 
-&lt;img src="clase07_files/figure-html/unnamed-chunk-17-1.png" width="50%" style="display: block; margin: auto;" /&gt;
-
----
-### Ejemplo: Tendencia determinística y estocástica
-
-
-```r
-trend &lt;- seq_along(austa)
-(fit1 &lt;- auto.arima(austa, d=0, xreg=trend))
-```
-
-```
-## Series: austa 
-## Regression with ARIMA(2,0,0) errors 
-## 
-## Coefficients:
-##          ar1      ar2  intercept    xreg
-##       1.1127  -0.3805     0.4156  0.1710
-## s.e.  0.1600   0.1585     0.1897  0.0088
-## 
-## sigma^2 estimated as 0.02979:  log likelihood=13.6
-## AIC=-17.2   AICc=-15.2   BIC=-9.28
-```
-
-`$$X_t=0.416+0.171t+\eta_t$$`
-`$$\eta_t=1.113\eta_{t-1}-0.380 \eta_{t-2}+\epsilon_t$$`
-`$$\epsilon_t \overset{iid}{\sim} N(0,0.03)$$`
-
-
----
-### Ejemplo: Tendencia determinística y estocástica
-
-
-```r
-(fit2 &lt;- auto.arima(austa, d=1))
-```
-
-```
-## Series: austa 
-## ARIMA(0,1,1) with drift 
-## 
-## Coefficients:
-##          ma1   drift
-##       0.3006  0.1735
-## s.e.  0.1647  0.0390
-## 
-## sigma^2 estimated as 0.03376:  log likelihood=10.62
-## AIC=-15.24   AICc=-14.46   BIC=-10.57
-```
-
-`$$X_t-X_{t-1}=0.173+\eta'_t,$$`
-o de otra forma,
-
-`$$X_t=X_0+0.173t+\eta_t$$`
-`$$\eta_t=\eta_{t-1}+0.301\epsilon_{t-1}+\epsilon_t$$`
-`$$\epsilon_t \overset{iid}{\sim} N(0,0.034)$$`
-
-
----
-### Tendencia determinística y estocástica
-
-
-&lt;img src="clase07_files/figure-html/unnamed-chunk-20-1.png" width="700px" height="500px" style="display: block; margin: auto;" /&gt;
-
-
-
----
-### Serie estacionaria por tendencia y por diferencia.
-
-- Ejemplo de estos dos tipos de estacionariedad:
-
-**Tendencia determinística:**
-`$$X_t=X_{t-1}+\mu=X_0+\mu t$$`
-**Tendencia estocástica (acumulación de choques aleatorias):**
-`$$X_t=X_{t-1}+\epsilon_t=X_0+\sum_{s=1}^t \epsilon_s$$`
-donde `\(\mu\)` es una constante y `\(\epsilon_t\)` es ruido blanco.
-
-
----
-### Serie estacionaria por tendencia y por diferencia.
-
-- En síntesis, una serie temporal `\(\left\lbrace X_t \right\rbrace\)` está compuesto por una tendencia determinística y un componente estocástico que es modelado por `\(ARIMA(p,d,q)\)`.
-- Se puede descomponer `\(\eta_t\)` en dos componentes: tendencia estocástica (choques aleatorios) y el componente aleatorio "estacionario". 
-- Entonces, `\(\left\lbrace X_t \right\rbrace\)` se puede descomponer en tres componentes:
-1. tendencia determinística,
-2. tendencia estocástica, y
-3. el componente "aleatorio".
-
-- Un modelo estacionario por tendencia, no tiene la tendencia estocástica, y el componente aleatorio es `\(ARMA(p,q)\)`.
-- En el caso de un modelo estacionario por diferencia, el polinomio autoregresivo del componente `\(\eta_t\)` tiene al menos una raíz unitaria.
-
-
----
-### Serie estacionaria por tendencia y por diferencia.
-
-.pull-left[
-
-&lt;img src="clase07_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /&gt;
-
-]
-.pull-right[
-
-&lt;img src="clase07_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /&gt;
-
-]
-
-
----
-### En la próxima clase veremos
-
-
-
-&lt;ol start="9"&gt;
-5. Procesos cointegrados: definición y pruebas de hipótesis para cointegración y modelos de corrección del error. &lt;br&gt;
-&lt;/ol&gt;
-
-
 
 ---
 
