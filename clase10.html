@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Series de tiempo II - Tópicos avanzados</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Shu Wei Chou C." />
+    <script src="clase10_files/header-attrs/header-attrs.js"></script>
+    <link href="clase10_files/remark-css/robot-fonts.css" rel="stylesheet" />
+    <link href="clase10_files/remark-css/robot.css" rel="stylesheet" />
+    <link href="clase10_files/remark-css/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Series de tiempo II - Tópicos avanzados
+## (PF-1360 y SP-2600)
+### Prof. Shu Wei Chou C.
+### Posgrado en Matemática - Posgrado en Estadística, UCR
+### 14-06-2022
+
+---
+
+
+
+
+
+
+
+### Tema III
+
+### Modelos de Espacio-Estado
+
+---
+## Contenido
+
+1. Representación en espacio de estados
+2. El filtro de Kalman: estimaciones de máxima verosimilitud, predicción, suavimzamiento y filtro.
+3. Aplicaciones de modelos de Espacio-Estado: volatilidad estocástica, modelos de regresión dinámica y modelos de suavizamiento exponencial.
+
+---
+### Introducción 
+
+- Propuesto inicialmente por [Kalman (1960)](https://doi.org/10.1115/1.3662552) y [Kalman (1961)](https://doi.org/10.1115/1.3658902).
+
+- Al inicio, el objetivo del modelo fue en el contexto de estudiar la posición o el estado `\(x_t\)` de una nave espacial por medio de una ecuación de estado, y una variable observada `\(y_t\)` relacionada al estado de la nave.
+
+- Es una clase de modelos muy amplia que incluye diferentes modelos estudiados (ARIMA, modelos de descomposición, etc.).
+
+- Enfocamos en **los Modelos de Espacio de Estados Lineales Gaussianos** o **Modelos Lineales Dinámicos (DLM)**.
+
+---
+### Los Modelos Lineales Gaussianos
+
+- El modelo de Espacio de Estados en general está caracterizado por dos procesos en el tiempo:
+
+1. **Un proceso latente (o un proceso oculto)** `\(x_t\)`: Se supone que es un proceso de Markov, i.e. `\(P(x_t|x_{t-1},x_{t-2},...)=P(x_t|x_{t-1})\)`
+2. **Un proceso de observaciones** `\(y_t\)`: Se supone que son independientes dado los estados `\(x_t\)`.
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figura1.png" alt="Fuente: Shumway &amp;amp; Stoffer (2017)" width="50%" /&gt;
+&lt;p class="caption"&gt;Fuente: Shumway &amp; Stoffer (2017)&lt;/p&gt;
+&lt;/div&gt;
+
+
+
+---
+### Los Modelos Lineales Gaussianos
+
+El modelo de espacio de estados lineal Gaussiano está definido por:
+
+1- **La ecuación de estados:** `\(~~~~~~~~~~~~~x_{t}=\Phi x_{t-1} + w_{t},\)`
+
+donde las variables de estado `\(x_t\)` son vectores `\(p \times 1\)` autoregresivos de orden 1,  
+`\(w_t\)` es un vector `\(p\times 1\)` tal que `\(w_t \overset{iid}{\sim} N_p(0,Q)\)`. Suponga que `\(x_0 \sim N_p(\mu_0,\Sigma_0)\)`.
+
+2- **La ecuación de observaciones:** `\(~~~~y_{t}=A_t x_{t} + v_{t},\)`
+
+
+donde `\(A_t\)` es una matriz `\(q\times q\)` (matriz de observación o medición),
+`\(y_t\)` es un vector `\(q \times 1\)` con `\(q \leq p\)`.
+`\(v_t\)` es ruido `\(q\times 1\)` tal que `\(v_t \overset{iid}{\sim} N_q(0,R)\)`. 
+
+- Suponga adicionalmente que `\(w_t\)` y `\(v_t\)` son no correlacionados.
+
+
+
+---
+### Ejemplo de motivación
+
+.pull-left[
+Dos series temporales de temperaturas globales de 1880 a 2015.
+- TO:Índice de temperatura global (terrestre y oceano)
+- T: el índice de temperatura global (terrestre)
+
+Estas dos series muestran mediciones climáticas de un proceso de estado, que es la temperatura "real" de la tierra.
+]
+.pull-right[
+&lt;img src="clase10_files/figure-html/unnamed-chunk-3-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+### Ejemplo de motivación
+
+- Por lo que podemos definir la ecuación de observaciones:
+
+`$$\begin{bmatrix}Y_{1,t}\\
+Y_{2,t}
+\end{bmatrix} = \begin{bmatrix}1\\
+1
+\end{bmatrix} X_{t} +
+\begin{bmatrix}v_{1,t}\\
+v_{2,t}
+\end{bmatrix}$$`
+
+donde `\(v_t \overset{iid}{\sim} N_2(0,R)\)` con "alguna correlación instantánea" de los ruidos de observación.
+
+`$$R=\begin{bmatrix} r_{11} &amp; r_{12}\\
+r_{21} &amp; r_{22}\end{bmatrix}$$`
+
+- Para la ecuación de estados, se puede considerar un modelo de caminata aleatoria con desvío:
+`$$X_t= \delta + X_{t-1}+w_t$$`
+
+
+
+
+
+---
+### Los Modelos Lineales Dinámicos Gaussianos
+
+- Note que el modelo anterior se puede incluir variables exógenas:
+
+`$$\left. \begin{eqnarray} x_{t}&amp;=&amp;\Phi x_{t-1} + \Upsilon u_t + w_{t}, \\ 
+y_{t}&amp;=&amp;A_t x_{t}+ \Gamma u_t + v_{t}  \end{eqnarray}\right.$$`
+
+donde `\(\Upsilon\)` es una matriz con dimensión `\(p\times r\)`,   
+`\(\Gamma\)` es una matriz con dimensión `\(q\times r\)` y  
+`\(u_t\)` tiene dimensión `\(r \times 1\)`.
+
+- El ejemplo anterior especifica que `\(\Upsilon=\delta\)`, `\(\Gamma=0\)` y `\(u_t=1\)`.
+
+- La representación de los modelos de espacio de estados es elegante ya que incluye una variedad de modelos diferentes. Sin embargo, la estimación de los parámetros desconocidos podría tener divergencia si no especifica bien sus valores iniciales.
+
+
+---
+### Representación en espacio de estados de ARIMA
+
+**AR(1)**: 
+- Sea `\(\left\lbrace Y_t \right\rbrace\)` un proceso AR(1) estacionario,
+
+`$$Y_t=\phi_1 Y_{t-1}+a_t$$`
+con su representación de un modelo lineal,o `\(MA(\infty)\)`: 
+`$$Y_t=\sum_{j=0}^{\infty} \phi_1^j a_{t-j}$$`
+---
+### Representación en espacio de estados de ARIMA
+
+- Considere la representación de espacio de estados, usando la ecuación de estados:
+`$$X_t=\phi_1 X_{t-1}+w_t, \text{ para } t=1,2,...$$`
+donde `$$X_1=Y_1=\sum_{j=0}^{\infty} \phi_1^j a_{1-j}$$`
+y la ecuación de observaciones:
+`$$Y_t=X_t$$`
+- Note que en este caso, `\(A_t=1\)`, `\(v_t=0\)`.
+
+
+---
+### Representación en espacio de estados de ARIMA
+
+**AR(2)**: 
+- Sea `\(\left\lbrace Y_t \right\rbrace\)` un proceso AR(2) estacionario,
+
+`$$Y_t=\phi_1 Y_{t-1}+\phi_2 Y_{t-2}+a_t$$`
+- Una representación en espacio de estados es:
+
+`$$Y_t = \begin{bmatrix} 1 &amp; 0 \end{bmatrix} X_{t}$$`
+`$$X_{t}= \begin{bmatrix} Y_{t} \\ \phi_2 Y_{t-1} \end{bmatrix}=\begin{bmatrix} \phi_1 &amp; 1 \\
+\phi_2 &amp; 0 \end{bmatrix}  X_{t-1}+\begin{bmatrix} a_{t} \\ 0 \end{bmatrix},$$`
+
+- Otra representación alternativa:
+
+`$$Y_t = \begin{bmatrix} 1 &amp; 0 \end{bmatrix} X_{t}$$`
+`$$X^*_{t}= \begin{bmatrix} Y_{t} \\ Y_{t-1} \end{bmatrix}=\begin{bmatrix} \phi_1 &amp; \phi_2 \\
+1 &amp; 0 \end{bmatrix}  X^*_{t-1}+\begin{bmatrix} a_{t} \\ 0 \end{bmatrix},$$`
+
+---
+### Representación en espacio de estados de ARIMA
+
+**MA(1)**: 
+
+- Sea `\(\left\lbrace Y_t \right\rbrace\)` un proceso MA(1) estacionario e invertible,
+
+`$$Y_t= a_t-\theta_1 a_{t-1}$$`
+- Una representación en espacio de estados es:
+
+`$$Y_t = \begin{bmatrix} 1 &amp; -\theta_1 \end{bmatrix} X_{t}$$`
+`$$X_{t}= \begin{bmatrix} a_{t} \\ a_{t-1} \end{bmatrix}=\begin{bmatrix} 0 &amp; 0 \\
+1 &amp; 0 \end{bmatrix}  X_{t-1}+\begin{bmatrix} a_{t} \\ 0 \end{bmatrix},$$`
+
+---
+### Filtro de Kalman
+
+- En la práctica, uno de los interéses es estimar el valor de `\(X_t\)` dado los datos observados `\(Y_{1:s}=\left\lbrace Y_1,...,Y_s \right\rbrace\)`.
+
+- La estimación de `\(X_t\)` se puede clasificar en 3 situaciones:
+1. Cuando `\(s&lt;t\)`, el problema es llamado **pronóstico** o **predicción**.
+2. Cuando `\(s=t\)`, el problema es llamado **filtración**.
+3. Cuando `\(s&gt;t\)`, el problema es llamado **suavizamiento**.
+
+- Denotamos 
+`$$X_t^s=E(X_t|Y_{1:s})=E(X_t|Y_{1},...,Y_{s}),$$`
+
+`$$P_{t_1,t_2}^s=E\left[(X_{t_1}-X_{t_1}^s)(X_{t_2}-X_{t_2}^s)'\right], ~~\text{y}$$`
+
+
+`$$P_{t}^s=E\left[(X_{t}-X_{t}^s)(X_{t}-X_{t}^s)'\right]$$`
+---
+### Filtro de Kalman
+
+**Propiedad:** Para el modelo de espacio de estados especificado anteriormente, con las condiciones iniciales `\(X_0^0=\mu_0\)` y `\(P_0^0=\Sigma_0\)`, y para `\(t=1,...,n\)`, se tiene que (**para predicción**)
+`$$\left. \begin{eqnarray} 
+X_t^{t-1}=\Phi X_{t-1}^{t-1}+\Upsilon u_t \\ 
+P_t^{t-1}=\Phi P_{t-1}^{t-1} \Phi'+Q 
+\end{eqnarray}\right.$$`
+y (**para filtración**)
+
+`$$\left. \begin{eqnarray} 
+X_t^{t}&amp;=&amp;X_t^{t-1}+K_t \left( Y_t - A_t X_{t}^{t-1} - \Gamma u_t \right), \\ 
+P_t^{t}&amp;=&amp; \left[ I-K_t A_t \right] P_{t}^{t-1},
+\end{eqnarray}\right.$$`
+
+donde `\(K_t=P_t^{t-1} A_t' \left[ A_t P_t^{t-1} A_t' + R \right]^{-1}\)` es llamado **la ganancia de kalman**.
+
+---
+### Filtro de Kalman
+
+- Si se interesa por la predicción para `\(t&gt;n\)`, se puede obtener recursivamente con las condiciones iniciales `\(X_n^n=\mu_n\)` y `\(P_n^n\)`.
+
+- Como consecuencia, se puede obtener el error de predicción:
+`$$\epsilon_t=Y_t-E(Y_t|Y_{1:t-1})=Y_t-A_t X_t^{t-1}+\Gamma u_t$$` 
+y su matriz de variancia-covariancia es dada por
+`$$\Sigma_t:=Var(\epsilon_t)=Var\left[ A_t (X_t-X_t^{t-1})+ v_t \right]=A_t P_t^{t-1}A_t'+ R$$`
+para `\(t=1,...,n\)`.
+
+---
+### Suavizamiento de Kalman
+
+**Propiedad:** Para el modelo de espacio de estados especificado anteriormente, con las condiciones iniciales `\(X_0^0=\mu_n\)` y `\(P_n^n\)`, y para `\(t=n,n-1,...,1\)`, se tiene que
+
+`$$\left. \begin{eqnarray} 
+X_{t-1}^{n}&amp;=&amp;X_{t-1}^{t-1}+J_{t-1} \left( X_{t}^{n}-X_{t}^{t-1} \right), \\ 
+P_{t-1}^{n}&amp;=&amp; P_{t-1}^{t-1}+ J_{t-1} \left( P_{t}^{n} -P_{t}^{t-1} \right)J_{t-1}'
+\end{eqnarray}\right.$$`
+
+donde `\(J_{t-1}=P_{t-1}^{t-1} \Phi' \left[ P_{t}^{t-1} \right]^{-1}\)`.
+
+
+---
+### Ejemplo: Modelo de nivel local
+
+- El modelo de nivel local tiene la siguiente estructura:
+
+`$$\left. \begin{eqnarray} 
+\mu_t&amp; = &amp; \mu_{t-1} +w_t \\ 
+Y_t&amp; = &amp; \mu_t +v_t \\ 
+\end{eqnarray}\right.$$`
+donde `\(w_t \overset{iid}{\sim}N(0,\sigma_w^2)\)` y `\(v_t \overset{iid}{\sim}N(0,\sigma_v^2)\)` son independientes. Es decir, la ecuación de estados consiste en una caminata aleatoria y la ecuación de observaciones consiste en un componente de tendencia y un ruido.
+- Recuerde que anteriormente se definió este modelo para las series de temperatura del ejemplo 2.
+
+---
+### Ejemplo: Modelo de nivel local
+
+- Simulación de una realización con `\(n=50\)`.
+`$$\left. \begin{eqnarray} 
+\mu_t&amp; = &amp; \mu_{t-1} +w_t \\ 
+Y_t&amp; = &amp; \mu_t +v_t \\ 
+\end{eqnarray}\right.$$`
+donde `\(w_t \overset{iid}{\sim}N(0,1)\)` y `\(v_t \overset{iid}{\sim}N(0,1)\)`
+
+&lt;img src="clase10_files/figure-html/unnamed-chunk-4-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+
+---
+### Ejemplo: Modelo de nivel local
+
+- Para calcular el filtro de Kalman, se definen las condiciones iniciales:
+`$$\mu_0=1,~ \Sigma_0^2=1,$$`
+`$$~ \phi=1,~ Q=1,~ R=1$$`
+- Recuerde que para predicción, se calcula recursivamente `$$\mu_t^{t-1}=X_t^{t-1}=E(X_t|Y_{1:t-1}), t=1,...,n.$$`
+- Para filtración, se calcula recursivamente `$$\mu_t^{t}=X_t^{t}=E(X_t|Y_{1:t}), t=1,...,n.$$`
+- Para suavizamiento, se calcula recursivamente `$$\mu_{t-1}^{n}=X_{t-1}^{n}=E(X_{t-1}|Y_{1:n}), t=n,n-1,...,1.$$`
+
+
+---
+### Ejemplo: Modelo de nivel local
+
+.pull-left[
+- Como estamos cosiderando un modelo Gaussiano, se puede obtener 
+
+Para predicción: `\(\mu_t^{t-1}\pm 2 \sqrt{P_t^{t-1}}\)`
+
+Para filtración: `\(\mu_t^{t}\pm 2 \sqrt{P_t^{t}}\)`
+
+Para suavizamiento: `\(\mu_t^{n}\pm 2 \sqrt{P_t^{n}}\)`
+
+
+]
+
+.pull-right[
+&lt;img src="clase10_files/figure-html/unnamed-chunk-5-1.png" width="120%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Algunas estructuras del modelo
+
+1. Modelo de tendencia local
+
+`$$\left. \begin{eqnarray} 
+ Y_t&amp; = &amp; \mu_t &amp; &amp;&amp; +\epsilon_t \\ 
+ \mu_t &amp; = &amp; \mu_{t-1} &amp;+ &amp; \beta_{t-1} &amp;+\eta_t \\
+  \beta_{t} &amp;= &amp; &amp; &amp; \beta_{t-1} &amp;+\xi_t
+\end{eqnarray}\right.$$`
+Su representación de espacio de estados es:
+
+`$$Y_t=\begin{bmatrix} 1 &amp; 0 \end{bmatrix}  \begin{bmatrix} \mu_{t} \\ \beta_{t} \end{bmatrix}+ \epsilon_t,$$`
+`$$\begin{bmatrix} \mu_{t} \\ \beta_{t} \end{bmatrix}=\begin{bmatrix} 1 &amp; 1 \\
+0 &amp; 1 \end{bmatrix}  \begin{bmatrix} \mu_{t-1} \\ \beta_{t-1} \end{bmatrix}+\begin{bmatrix} \eta_t \\ \xi_{t} \end{bmatrix},$$`
+
+2. De manera similar, se puede considerar el componente de estacionalidad:
+`$$Y_t = \mu_t+S_t +\epsilon_t$$`
+
+
+
+---
+### Estimaciones de máxima verosimilitud
+
+- La estimación de los parámetros de un modelo de espacio de estados se puede utilizar estimación clásica o Bayesiana.
+- Concentramos la estimación de máxima verosimilitud (clásica).
+- Considere `\(\Theta\)` como el vector de los parámetros desconocidos del modelo, i.e. incluyen todos los parámetros de:
+  - condiciones iniciales, `\(\mu_0\)` y `\(\Sigma_0\)`
+  - Las matrices de transición de las ecuaciones de estados y de observaciones, `\(\Phi, A_t\)` 
+  - Las matrices de covariancias de los errores `\(Q,R\)` 
+  - Las matrices de las variables exógenas `\(\Upsilon,\Gamma\)`
+
+
+---
+### Estimaciones de máxima verosimilitud
+
+
+- De acuerdo a los cálculos de las innovaciones `\(\epsilon_1,...,\epsilon_n\)`
+`$$\epsilon_t=Y_t-A_t X_t^{t-1}-\Gamma u_t,$$`
+y las matrices de covariancia
+`$$\Sigma_t=A_t P_t^{t-1}A_t' + R$$`
+- La función de log-verosimilitud (negativa) es dada por
+
+`$$- \ell_Y (\Theta)=\frac{1}{2} \sum_{t=1}^n \ln|\Sigma_t(\Theta)|+\frac{1}{2} \sum_{t=1}^n \epsilon_t(\Theta)' \Sigma_t(\Theta)^{-1} \epsilon_t(\Theta)$$`
+- Dada la complejidad de dicha función, en la práctica se realiza la minimización utilizando métodos numéricos como Newton-Raphson.
+
+- Sin embargo, por la flexibilidad de un modelo de espacio de estados, muchos problemas de optimización (mínimo local o divergencia) pueden ocurrir.
+
+---
+### Extensiones de los modelos de espacios de estados
+
+- En la literatura, diversas extensiones han sido estudiadas. Por ejemplo, los coeficientes `\(\Phi, \Upsilon, \Gamma\)` y las matrices de covariancias de los errores `\(Q\)` y `\(R\)` pueden variando en el tiempo, i.e.
+
+`$$\left. \begin{eqnarray} x_{t}&amp;=&amp;\Phi_t x_{t-1} + \Upsilon_t u_t + w_{t}, \\ 
+y_{t}&amp;=&amp;A_t x_{t}+ \Gamma_t u_t + v_{t}  \end{eqnarray}\right.$$`
+`\(w_t \overset{iid}{\sim} N_q(0,Q_t)\)`,
+`\(v_t \overset{iid}{\sim} N_q(0,R_t)\)`. 
+
+- Incluso la extensión del modelo Gaussiano a un modelo de familia exponencial.
+
+- En estos casos, la estimación Bayesiana es más flexible para obtener las estimaciones del modelo.
+
+---
+### Manejo de datos perdidos
+
+- Los modelos de espacio de estados son flexibles para tratar datos perdidos.
+- Vamos a ver una idea básica del tratamiento de ellos.
+- Para la ecuación de observaciones, defina
+
+`$$\begin{bmatrix}Y_t^{(1)}\\
+Y_t^{(2)}
+\end{bmatrix} = \begin{bmatrix}A_t^{(1)}\\
+A_t^{(2)}   
+\end{bmatrix} X_{t} +\begin{bmatrix}v_{t}^{(1)}\\
+v_{t}^{(2)}
+\end{bmatrix},$$`
+donde `\(Y_t^{(1)}\)` es un vector observable `\((q_{1t} \times 1)\)` y `\(Y_t^{(2)}\)` es un vector no observable `\((q_{2t} \times 1)\)`, de modo que `\(q=q_{1t}+q_{2t}\)`
+ 
+- Para los instantes `\(t\)` que tienen datos perdidos en las observaciones de `\(Y_t^{(2)}\)`, se puede definir
+
+`$$\begin{bmatrix}Y_t^{(1)}\\
+Y_t^{(2)}
+\end{bmatrix} = \begin{bmatrix}A_t^{(1)}\\
+0   
+\end{bmatrix} X_{t} +\begin{bmatrix}v_{t}^{(1)}\\
+v_{t}^{(2)}
+\end{bmatrix}.$$`
+
+ 
+---
+### Ejemplo
+
+- Monitoreo del nivel de varios indicadores por 91 días después de una cirugía de médula osea de paciente con cáncer.
+  - WBC: conteo de glóbulos blancos (en log)
+  - PLT: conteo de plaquetas (en log)
+  - HCT: conteo de hematocrito (en log)
+
+.pull-left[
+- Aproximadamente 40% de los datos después de los 35 días de seguimiento son perdidos.
+- El objetivo principal e este estudio es modelar la dinámica de estas 3 series temporales y estimar los valores perdidos.
+- "La cantidad de plaquetas 100 días después de una cirugía es un indicador de una sobrevivencia post cirugía."
+]
+.pull-right[
+&lt;img src="clase10_files/figure-html/unnamed-chunk-6-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Ejemplo
+
+Utilizando el enfoque de modelo de espacio de estados, se puede considerar la ecuación de estados:
+
+`$$\begin{bmatrix}X_{1,t}\\
+X_{2,t}\\
+X_{3,t}
+\end{bmatrix} = \begin{bmatrix}\phi_{11} &amp; \phi_{12} &amp; \phi_{13} \\
+\phi_{21} &amp; \phi_{22} &amp; \phi_{23} \\
+\phi_{31} &amp; \phi_{32} &amp; \phi_{33} 
+\end{bmatrix} \begin{bmatrix}X_{1,t-1}\\
+X_{2,t-1} \\ 
+X_{3,t-1}
+\end{bmatrix}  +\begin{bmatrix}w_{1,t}\\
+w_{2,t}\\
+w_{3,t}
+\end{bmatrix}$$`
+
+Y la ecuación de observaciones:
+
+`$$\begin{bmatrix}Y_{1,t}\\
+Y_{2,t}\\
+Y_{3,t}
+\end{bmatrix} = A_t \begin{bmatrix}X_{1,t}\\
+X_{2,t} \\ 
+X_{3,t}
+\end{bmatrix}  +\begin{bmatrix}v_{1,t}\\
+v_{2,t}\\
+v_{3,t}
+\end{bmatrix}$$`
+
+- `\(A_t\)` puede ser una matriz de identidad (si ese día se tomó una muestra) o una matriz nula (si no se tomó la muestra). 
+
+---
+### Ejemplo
+
+Note que la ecuación del estado tiene forma de AR(1), pero habíamos visto que cualquier AR(p) puede ser representado por AR(1).
+
+Por ejemplo un AR(2) puede ser representado por la ecuación de estados
+
+`$$\underset{(2p \times 1)}{\begin{bmatrix}X_{t}\\
+X_{t-1}
+\end{bmatrix}} = \underset{(2p \times 2p)}{\begin{bmatrix}\Phi_{1} &amp; \Phi_{2} \\
+I &amp; 0
+\end{bmatrix}} \underset{(2p \times 1)}{\begin{bmatrix}X_{t-1}\\
+X_{t-2}
+\end{bmatrix}}  +\underset{(2p \times 1)}{\begin{bmatrix}w_{1,t}\\
+w_{0}
+\end{bmatrix}}$$`
+
+Y la ecuación de observaciones:
+
+`$$\underset{(q \times 1)}{Y_{t}} = \underset{(q \times 2p)}{\begin{bmatrix}I &amp; 0\end{bmatrix}}
+\underset{(2p \times 1)}{\begin{bmatrix}X_{t}\\
+X_{t-1} 
+\end{bmatrix}}  +
+\underset{(q \times 1)}{v_{t}}$$`
+
+---
+### Ejemplo
+
+
+
+
+&lt;img src="clase10_files/figure-html/unnamed-chunk-8-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+
+---
+### En la próxima clase veremos
+
+
+&lt;ol start="3"&gt;
+
+3. Aplicaciones de modelos de Espacio-Estado.  &lt;/p&gt; &lt;br&gt;
+&lt;/ol&gt;
+
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
