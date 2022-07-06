@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Series de tiempo II - Tópicos avanzados</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Shu Wei Chou C." />
+    <script src="clase11_files/header-attrs/header-attrs.js"></script>
+    <link href="clase11_files/remark-css/robot-fonts.css" rel="stylesheet" />
+    <link href="clase11_files/remark-css/robot.css" rel="stylesheet" />
+    <link href="clase11_files/remark-css/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Series de tiempo II - Tópicos avanzados
+## (PF-1360 y SP-2600)
+### Prof. Shu Wei Chou C.
+### Posgrado en Matemática - Posgrado en Estadística, UCR
+### 14-06-2022
+
+---
+
+
+
+
+
+
+
+### Tema III
+
+### Modelos de Espacio-Estado
+
+
+1. Representación en espacio de estados
+2. El filtro de Kalman: estimaciones de máxima verosimilitud, predicción, suavimzamiento y filtro.
+
+
+---
+## Contenido
+
+
+&lt;ol start="3"&gt;
+3. Aplicaciones de modelos de Espacio-Estado: volatilidad estocástica, modelos de regresión dinámica y modelos de suavizamiento exponencial.
+&lt;/ol&gt;
+
+
+---
+### Introducción 
+
+- Existe una variedad de literatura y paquetes en R para tratar los modelos de espacio de estados.
+
+  - Paquetes generales que proporciona estimación máxima verosimilitud, filtro de Kalman y estimación Bayesiana para DLM o modelos de espacio de estados lineal Gaussiano: [dse](https://cran.r-project.org/web/packages/dse/dse.pdf), [dlm](https://cran.r-project.org/web/packages/dlm/dlm.pdf), [statespacer](https://dylanb95.github.io/statespacer/), etc.
+
+  - Modelo de espacio de estados con familia exponencial.
+[KFAS](https://cran.r-project.org/web/packages/KFAS/KFAS.pdf): 
+
+  - Enfoque Bayesiano: [bsts](https://cran.r-project.org/web/packages/bsts/bsts.pdf).
+
+- La dificultad de que cada referencia usa una notación diferente, pero la estructura del modelo es la misma.
+
+- Una buena referencia que resume las diferencias y ventajas de algunos paquetes: [State Space Models in R](https://www.jstatsoft.org/article/view/v041i04)
+
+---
+### Introducción 
+
+- Concentramos en el paquete `dlm`
+
+1. **La ecuación de observaciones:** `\(~~~~y_{t}=F_t \theta_{t} + v_{t},\)`
+2. **La ecuación de estados:** `\(~~~~~~~~~~~~~\theta_{t}=G_t \theta_{t-1} + w_{t},\)`
+
+para `\(t=1,...,n,\)` con la condición inicial `\(\theta_0 \sim N_p(m_0,C_0)\)`.   
+
+Las variables de estado `\(\theta_t\)` son vectores `\(p \times 1\)` autoregresivos de orden 1, y las observaciones `\(y_t\)` son vectores `\(m \times 1\)`.    
+
+`\(F_t\)` y `\(G_t\)` son matrices `\(m\times p\)` y `\(p\times p\)`, respectivamente.
+
+`\(v_t\)` es ruido `\(q\times 1\)` tal que `\(v_t \overset{iid}{\sim} N_m(0,V_t)\)`. 
+
+`\(w_t\)` es un vector `\(p\times 1\)` tal que `\(w_t \overset{iid}{\sim} N_p(0,W_t)\)`. 
+
+
+---
+### Filtro de Kalman
+
+- En la práctica, uno de los interéses es estimar el valor de `\(\theta_t\)` dado los datos observados `\(y_{1:s}=\left\lbrace y_1,...,y_s \right\rbrace\)`.
+
+- La estimación de `\(\theta_t\)` se puede clasificar en 3 situaciones:
+1. Cuando `\(s&lt;t\)`, el problema es llamado **pronóstico** o **predicción**.
+2. Cuando `\(s=t\)`, el problema es llamado **filtración**.
+3. Cuando `\(s&gt;t\)`, el problema es llamado **suavizamiento**.
+
+---
+### Funciones básicas del paquete `dlm`
+
+- Recuerden que:
+
+1. **La ecuación de observaciones:** `\(~~~~y_{t}=F_t \theta_{t} + v_{t},~~~~~~~~~ v_t \overset{iid}{\sim} N_m(0,V_t)\)`
+2. **La ecuación de estados:** `\(~~~~~~~~~~~~~\theta_{t}=G_t \theta_{t-1} + w_{t},~~~~w_t \overset{iid}{\sim} N_p(0,W_t)\)`
+
+para `\(t=1,...,n,\)` con la condición inicial `\(\theta_0 \sim N_p(m_0,C_0)\)`.   
+
+| Parámetro      | Argumento de la función    |
+|----------------|----------------------------|
+| `\(F\)`            | `FF`                       |
+| `\(V\)`            | `V`                        |
+| `\(G\)`            | `GG`                       |
+| `\(W\)`            | `W`                        |
+| `\(C_0\)`          | `C0`                       |
+| `\(m_0\)`          | `m0`                       |
+
+
+---
+### Notas importantes
+
+
+- La escogencia de `\(F_t\)` y `\(G_t\)` depende del usuario al observar la naturaleza de las series observadas.
+
+- La especificación del modelo requiere la descripción de las variancias `\(V_t\)` y `\(W_t\)`. En la práctica, es común suponer que son constantes en el tiempo, i.e. `\(V_t=V\)` y `\(W_t=W\)`.
+ 
+ 
+
+---
+### Funciones básicas del paquete `dlm`
+
+| Funciones      | Modelo                                  |
+|----------------|-----------------------------------------|
+| `dlm`          | DLM genérico                            |
+| `dlmModARMA`   |  modelo ARMA                            |
+| `dlmModPoly`   | DLM del polinomio del n-ésimo orden     |
+| `dlmReg`       | Regresión lineal                        |
+| `dlmSeas`      | factores periódicos, o estacionales     |
+| `dlmTrig`      | funciones periódicas o trigonométricas  |
+
+&lt;br&gt;
+
+
+| funciones      | Método                                  |
+|----------------|-----------------------------------------|
+| `dlmFilter`    |  Filtro de Kalman                   |
+| `dlmSmooth`    |  Suavizamiento de Kalman                |
+| `dlmForecast`  |  Predicción                             |
+| `dlmLL`        |  Función de verosimilitud               |
+| `dlmMLE`       |  Estimación ML                          |
+
+ 
+ 
+---
+### DLM de primer orden (Modelo de nivel local)
+
+- El modelo de nivel local tiene la siguiente estructura:
+
+`$$\left. \begin{eqnarray} 
+y_t&amp; = &amp; \theta_t +v_t, &amp; v_t \overset{iid}{\sim}N(0,V) \\ 
+\theta_t&amp; = &amp; \theta_{t-1} +w_t, &amp; w_t \overset{iid}{\sim}N(0,W) \\ 
+\end{eqnarray}\right.$$`
+ 
+- `\(\theta_t\)` es escalar y `\(F_t=G_t=1\)`.
+
+- La ecuación de estados consiste en una caminata aleatoria y la ecuación de observaciones consiste en un componente de tendencia y un ruido.
+
+- Observe que la variancia de las observaciones y de los estados puede variar en el tiempo.
+
+
+---
+### DLM de primer orden (Modelo de nivel local)
+
+- Usualmente definimos `\(V_t=V\)` y `\(W_t=W\)`, entonces para especificar por ejemplo:
+
+`$$\left. \begin{eqnarray} 
+y_t&amp; = &amp; \theta_t +v_t, &amp; v_t \overset{iid}{\sim}N(0,0.8) \\ 
+\theta_t&amp; = &amp; \theta_{t-1} +w_t, &amp; w_t \overset{iid}{\sim}N(0,0.1) \\ 
+\end{eqnarray}\right.$$`
+ 
+- Usando la función genérica:
+
+
+
+```r
+dlm(FF = 1, V = 0.8, GG = 1, W = 0.1, m0 = 0, C0 = 100)
+```
+
+- o bien usando la función `dlmModPoly`
+
+
+```r
+dlmModPoly(order = 1, dV = 0.8, dW = 0.1, C0 = 100)
+```
+
+
+---
+### Ejemplo: Caudal anual del Rio Nilo
+
+
+Mediciones del caudal anual del Nilo en Asuán, Egipto., 1871–1970, en `\(10^8 m^3\)`,
+
+&lt;img src="clase11_files/figure-html/unnamed-chunk-4-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+### Ejemplo: Caudal anual del Rio Nilo
+
+- Después de estimar por máxima veroslimitud el modelo de nivel local, se tiene que
+
+`$$\hat{V}=15099, \hat{W}=1469$$`
+.pull-left[
+&lt;img src="clase11_files/figure-html/unnamed-chunk-5-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+&lt;img src="clase11_files/figure-html/unnamed-chunk-6-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+&lt;img src="clase11_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+&lt;img src="clase11_files/figure-html/unnamed-chunk-8-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+---
+### DLM de segundo orden
+
+- El modelo de nivel local tiene la siguiente estructura:
+
+`$$\left. \begin{eqnarray} 
+y_t&amp; = &amp; \theta_{1,t} &amp; &amp; +v_t, &amp; &amp;~~~v_t \overset{iid}{\sim}N(0,V_t) \\ 
+\theta_{1,t}&amp; = &amp; \theta_{1,t-1}  +&amp;\theta_{2,t-1} &amp; +w_{1,t}, &amp; &amp;  \\ 
+\theta_{2,t}&amp; = &amp;  &amp; \theta_{2,t-1} &amp; +w_{2,t}, &amp; &amp; ~~~ \\
+\end{eqnarray}\right.$$`
+
+donde `\(w_t=(w_{1,t},w_{2,t})'\overset{iid}{\sim}N(0,W_t)\)`
+ 
+Este modelo se puede escribir con la fórmula general: `$$F_t=(1,0)~~~G_t=\begin{bmatrix}1 &amp; 1\\ 0 &amp; 1 \end{bmatrix}$$`
+ 
+---
+### Ejemplo: Caudal anual del Rio Nilo
+
+
+
+```r
+dlm.orden2 &lt;- function(theta) {
+  dlmModPoly(order = 2, dV = theta[1], dW = c(0,theta[2]))
+}
+fit2 &lt;- dlmMLE(Nile, parm = c(1,1), dlm.orden2, lower = rep(1e-4,1e-4))
+fit2$par
+```
+
+```
+## [1] 18972.078522     1.628592
+```
+
+---
+
+&lt;img src="clase11_files/figure-html/unnamed-chunk-10-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+### Ejemplo: AR(1)
+
+.pull-left[
+- Simulación:
+
+```r
+set.seed(12345)
+y = arima.sim(n=250,
+              list(ar=0.75,ma=0),sd=0.5)
+ts.plot(y)
+```
+
+&lt;img src="clase11_files/figure-html/unnamed-chunk-11-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+]
+.pull-right[
+- Estimación usando `Arima`:
+
+```r
+(mod.ar = Arima(y,order=c(1,0,0),
+                include.mean=FALSE))
+```
+
+```
+## Series: y 
+## ARIMA(1,0,0) with zero mean 
+## 
+## Coefficients:
+##          ar1
+##       0.7384
+## s.e.  0.0422
+## 
+## sigma^2 estimated as 0.2762:  log likelihood=-193.78
+## AIC=391.56   AICc=391.61   BIC=398.61
+```
+
+]
+
+
+---
+### Representación de espacio de estados de AR(1)
+
+- Considere un AR(1):
+`$$Y_t=\phi Y_{t-1}+a_t, \text{ para } t=1,2,...$$`
+- Habíamos visto su representación de espacio de estados:
+
+  - la ecuación de observaciones: `\(~Y_t=\theta_t\)`
+  - la ecuación de estados: `\(~~~~~~~~~~\theta_t=\phi\theta_{t-1}+w_t,\)`
+  
+donde `$$\theta_1=Y_1=\sum_{j=0}^{\infty} \phi_1^j w_{1-j}$$`
+
+- Del curso pasado, habíamos visto que:
+
+`$$E(\theta_t)=E(Y_t)=0 ~\text{, y}~~~\gamma_\theta(h)=\frac{\sigma_w^2 \phi^h}{1-\phi^2}$$`
+
+  
+---
+### Representación de espacio de estados de AR(1)
+  
+- Para las condiciones iniciales, tenemos:  
+`$$E(\theta_0)=0 ~\text{, y}~~~Var(\theta_0)=\gamma_\theta(0)=\frac{\sigma_w^2}{1-\phi^2}.$$`  
+  
+  
+- Es decir, `\(F=1,, V=0, G=\phi, W=\sigma^2\)`
+
+
+```r
+# Configuración de un DLM
+dlm0 = function(parm){
+  return(dlm(FF=1,V=0,GG=parm[1],W=parm[2]^2,
+             m0=0,C0=solve(1-parm[1]^2)*parm[2]^2))
+}
+```
+
+
+---
+### Ejemplo: AR(1)
+
+
+```r
+# Estimación
+fitAR1 = dlmMLE(y=y,parm=c(0.7,1.0),build=dlm0,hessian=T)
+# Estimaciones
+(coef = fitAR1$par)
+```
+
+```
+## [1] 0.7383927 0.5244622
+```
+
+
+```r
+# Error estándar
+var = solve(fitAR1$hessian)
+sqrt(diag(var))
+```
+
+```
+## [1] 0.04223371 0.02345483
+```
+
+
+
+---
+### Ejemplo: AR(1)
+
+- Pronóstico de 80% con `dlmFOrecast`:
+
+```
+## Time Series:
+## Start = 251 
+## End = 255 
+## Frequency = 1 
+##        forecast         li        ls
+## 251 -0.26994808 -0.9420735 0.4021773
+## 252 -0.19932769 -1.0348268 0.6361714
+## 253 -0.14718212 -1.0595147 0.7651505
+## 254 -0.10867820 -1.0602926 0.8429362
+## 255 -0.08024719 -1.0526107 0.8921164
+```
+
+- Pronóstico con `Arima`:
+
+
+```
+##     Point Forecast      Lo 80     Hi 80     Lo 95     Hi 95
+## 251    -0.26994825 -0.9434199 0.4035234 -1.299934 0.7600378
+## 252    -0.19932795 -1.0365008 0.6378449 -1.479673 1.0810174
+## 253    -0.14718240 -1.0613428 0.7669780 -1.545270 1.2509053
+## 254    -0.10867848 -1.0621995 0.8448426 -1.566963 1.3496061
+## 255    -0.08024745 -1.0545593 0.8940644 -1.570329 1.4098339
+```
+
+---
+### Combinación de modelos de espacio de estados
+
+- Suponga que tenemos `\(i=1,...,k\)` independientes DLMs para observaciones de `\(m\)` dimensiones.
+
+
+`$$\left. \begin{eqnarray} 
+	y_{t}^{(i)}&amp;= &amp; F_t^{(i)} \theta_{t}^{(i)} &amp; + v_{t}^{(i)}, &amp;&amp; v_{t}^{(i)}\sim N(0,V^{(i)})\\
+	\theta_{t}^{(i)}&amp;= &amp; G_t^{(i)} \theta_{t-1}^{(i)} &amp; + w_{t}^{(i)},&amp;&amp; w_{t}^{(i)}\sim N(0,W^{(i)})
+\end{eqnarray}\right.$$`
+
+para `\(t=1,...,n,\)` con las condiciones iniciales `\(\theta_0^{(i)} \sim N_p(m_0^{(i)},C_0^{(i)})\)` para `\(i=1,...,k\)`.   
+
+- Note que las dimensiones de los estados de cada DLM puede ser diferente. Denote `\(p_1,...,p_k\)` por las dimensiones de cada DLM.
+
+- Se puede especificar varios DLMs (tendencias, ARIMA, estacionalidad, variables exógenas, etc.) y sumarlas de forma independiente para formar un modelo que contempla todas estos componentes.
+
+---
+- De esta forma, la observación en el tiempo `\(t\)` es el resultado de la suma de los modelos:
+`$$y_t=y_t^{(1)}+...+y_t^{(k)}$$`
+y las cantidades del modelo de espacio de estados sean definidas de la siguiente forma:
+
+`$$F_t=\left(F_t^{(1)} ... F_t^{(k)} \right),~~~ V_t=\sum_{i=1}^k V_t^{(i)}$$`
+`$$G_t=\begin{bmatrix} G_t^{(1)} &amp; &amp; \\ &amp; \ddots &amp;  \\ &amp; &amp; G_t^{(k)} \end{bmatrix}~~W_t=\begin{bmatrix} W_t^{(1)} &amp; &amp; \\ &amp; \ddots &amp;  \\ &amp; &amp; W_t^{(k)} \end{bmatrix}$$`
+ `$$m'_t=\left({m_0^{(1)}}' ... {m_0^{(k)}}' \right),~~~ C_t=\begin{bmatrix} C_0^{(1)} &amp; &amp; \\ &amp; \ddots &amp;  \\ &amp; &amp; C_0^{(k)} \end{bmatrix}$$`
+
+
+---
+### Ejemplo: `dlmModPoly` y `dlmModARMA`
+
+
+
+```r
+n.obs = 250
+yt = 2 + arima.sim(n=n.obs,list(ar=.75,ma=0),sd=.5)
+plot(yt)
+```
+
+&lt;img src="clase11_files/figure-html/unnamed-chunk-18-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+### Factor estacional - dlmModSeas
+
+- Para un modelo estacional con periodo `\(s\)`, podemos considerar estados de dimensión `\((s-1)\)`:
+
+`$$F_t=(1,0,...,0),~~~
+G=\begin{bmatrix} 
+-1 &amp; -1 &amp; \dots &amp; -1 &amp; -1\\ 
+1 &amp; 0 &amp; \dots &amp; 0 &amp; 0\\
+0 &amp; 1 &amp; \dots &amp; 0 &amp; 0\\
+\vdots &amp; \vdots &amp; \ddots &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; \dots &amp; 1 &amp; 0 \end{bmatrix}$$`
+
+Variacia de las innovaciones de los estados: `\(diag(W,...,0)\)`
+ 
+---
+### Ejemplo con dlmModSeas
+
+
+
+```r
+mod=dlmModSeas(frequency = 4, dV=3.5 ,dW=c(4.2,0,0))
+mod$FF
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    0    0
+```
+
+```r
+mod$V
+```
+
+```
+##      [,1]
+## [1,]  3.5
+```
+
+```r
+mod$GG
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]   -1   -1   -1
+## [2,]    1    0    0
+## [3,]    0    1    0
+```
+
+```r
+mod$W
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]  4.2    0    0
+## [2,]  0.0    0    0
+## [3,]  0.0    0    0
+```
+
+
+---
+### Ejemplo
+
+En el laboratorio, veremos:
+1. `dlmModPoly` y `dlmModARMA`
+2. `dlmModPoly` y `dlmModSeas`: consumo de gas en Reino Unido.
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
