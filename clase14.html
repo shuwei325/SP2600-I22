@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Series de tiempo II - Tópicos avanzados</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Prof. Shu Wei Chou C." />
+    <script src="clase14_files/header-attrs/header-attrs.js"></script>
+    <link href="clase14_files/remark-css/robot-fonts.css" rel="stylesheet" />
+    <link href="clase14_files/remark-css/robot.css" rel="stylesheet" />
+    <link href="clase14_files/remark-css/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Series de tiempo II - Tópicos avanzados
+]
+.subtitle[
+## (PF-1360 y SP-2600)
+]
+.author[
+### Prof. Shu Wei Chou C.
+]
+.institute[
+### Posgrado en Matemática - Posgrado en Estadística, UCR
+]
+.date[
+### 12-07-2022
+]
+
+---
+
+
+
+
+
+
+
+### Tema IV: Modelos no lineales
+1. Introducción
+2. ARCH
+3. GARCH
+4. extensiones del modelo GARCH: EGARCH y TGARCH.
+
+### Tema V: Otros temas
+
+1. Distribuciones asimétricas
+2. Aplicaciones en los modelos ARCH y GARCH
+
+---
+### Introducción 
+
+- En la práctica, se observan fenómenos con variancia condicional que evoluciona con el tiempo y los modelos ARIMA no son adecuados para estos fenómenos.
+
+- La aplicación más utilizada y conocida es en las series financieras.
+
+- Existe una variedad de modelos no lineales en la literatura.
+
+- Vamos a enfocarnos en la clase de modelos GARCH:
+  - **ARCH** (*AutoRegressive Conditional Heteroscedastic*): Modelos autoregresivos con heteroscedasticidad condicional.
+  
+  - **GARCH** (*Generalized AutoRegressive Conditional Heteroscedastic*): Modelos autoregresivos con heteroscedasticidad condicional generalizada.
+
+  - Extensiones del modelo GARCH: EGARCH y TGARCH.
+
+---
+### Extensiones del modelo GARCH
+
+Son modelos heteroscedásticos condicionales que tratan a la asimetría de la serie.
+
+1. Exponential GAGRCH (EGARCH).
+2. Threshold GARCH (TGARCH).
+
+
+
+
+**Ejemplo: promedio diario industrial Dow Jone**
+
+.pull-left[
+&lt;img src="clase14_files/figure-html/unnamed-chunk-3-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="clase14_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+]
+
+---
+### Exponential GAGRCH (EGARCH).
+
+- Esta clase de modelo, propuesto por Nelson (1991), permite el efecto de asimetría  entre los retornos positivos y negativos.
+
+`$$X_t=\sqrt{h_t} \epsilon_t$$`
+`$$\ln (h_t)= \alpha_0 + \alpha_1 g(\epsilon_{t-1}) + \beta_1 \ln (h_{t-1})$$`
+donde `\(\epsilon_t\)` son i.i.d. con media zero y `\(g(\cdot)\)` es llamada la curva de impacto de información dada por:
+`$$g(\epsilon_t)=\theta \epsilon_t + \gamma \left[ |\epsilon_t|-E(|\epsilon_t|) \right]$$`
+y `\(\theta\)` y `\(\gamma\)` son parámetros reales.
+
+- Note que `\(|\epsilon_t|-E(|\epsilon_t|)\)` es una secuencia de variables i.i.d. con media cero.
+- Y por lo tanto, `\(E[g(\epsilon_t)]=0\)`
+
+---
+### Exponential GAGRCH (EGARCH).
+
+- Si se abre la expresión, se tiene que:
+
+`$$g(\epsilon_t)=\left\lbrace \begin{aligned}
+(\theta + \gamma) \epsilon_t - \gamma E(|\epsilon_t|) &amp; &amp; \text{si}~ \epsilon_t \geq 0 \\
+(\theta - \gamma) \epsilon_t - \gamma E(|\epsilon_t|) &amp;  &amp; \text{si}~ \epsilon_t &lt; 0 
+\end{aligned}
+\right.$$`
+- De esta forma, esperamos que los retornos negativos tengan más impacto en la volatilidad, cuando `\(\gamma&lt;0\)`.
+
+- Esta asimetría permite que la volatilidad responde más rápidamente a retornos negativos que los positivos.
+
+---
+- De forma general, un EGARCH(m,n) es:
+
+`$$X_t=\sqrt{h_t} \epsilon_t$$`
+`$$\ln (h_t)= \alpha_0 + \frac{1+\beta_1 B + ...+ \beta_{n-1} B^{n-1}}{1-\alpha_1 B - ...- \alpha_m B^m} g(\epsilon_{t-1})$$`
+donde los operadores en `\(B\)` tienen raíces fuera del círculo unitario.
+
+
+- Como ilustración, considere un EGARCH(1,1), i.e.
+
+`$$\ln (h_t)= \alpha_0 + \frac{1}{1-\alpha_1 B} g(\epsilon_{t-1})$$`
+`$$(1-\alpha_1 B) \ln (h_t)= (1-\alpha_1) \alpha_0 + g(\epsilon_{t-1})$$`
+
+`$$g(\epsilon_t)=\left\lbrace \begin{aligned}
+(\theta + \gamma) \epsilon_t - \gamma E(|\epsilon_t|) &amp; &amp; \text{si}~ \epsilon_t \geq 0 \\
+(\theta - \gamma) \epsilon_t - \gamma E(|\epsilon_t|) &amp;  &amp; \text{si}~ \epsilon_t &lt; 0 
+\end{aligned}
+\right.$$`
+
+
+
+---
+### *Threshold* GAGRCH (TGARCH).
+
+- Esta clase de modelo también permite agregar un efecto de asimetría entre los retornos positivos y negativos.
+
+- Un modelo TGARCH(m,n) asume la siguiente forma:
+
+`$$X_t=\sqrt{h_t} \epsilon_t$$`
+`$$h_t= \alpha_0 + \sum_{i=1}^n (\alpha_i + \gamma_i I_{\left\lbrace X_{t-i}&lt;0\right\rbrace }) X^2_{t-i} + \sum_{j=1}^m \beta_j h_{t-j}$$`
+donde `\(I_{\left\lbrace X_s&lt;0\right\rbrace}\)` es una función indicadora, i.e.
+
+`$$I_{\left\lbrace X_s&lt;0\right\rbrace}=
+\left\lbrace \begin{aligned}
+1 &amp; &amp; \text{si}~ X_s&lt;0 \\
+0 &amp; &amp; \text{si}~ X_s&gt;0 \\ 
+\end{aligned}
+\right.$$`
+
+---
+### *Threshold* GAGRCH (TGARCH).
+
+
+- Un modelo TGARCH(1,1) asume la siguiente forma:
+
+`$$X_t=\sqrt{h_t} \epsilon_t$$`
+`$$h_t= \alpha_0 + (\alpha_1 + \gamma_1 I_{\left\lbrace \epsilon_{t-1}&lt;0\right\rbrace }) \epsilon^2_{t-1} + \beta_1 h_{t-1}$$`
+donde `\(I_{\epsilon_s&gt;0}\)` es una función indicadora, i.e.
+
+`$$I_{\left\lbrace\epsilon_s&gt;0\right\rbrace}=
+\left\lbrace \begin{aligned}
+1 &amp; &amp; \text{si}~ \epsilon_s&lt;0~~~ \text{(mala noticia)} \\
+0 &amp; &amp; \text{si}~ \epsilon_s&gt;0~~~ \text{(buena noticia)} \\ 
+\end{aligned}
+\right.$$`
+- Si `\(\gamma \neq 0\)`, hay un impacto de información asimétrica.
+- Si `\(\gamma &gt; 0\)`, mala noticia tiene un impacto mayor.
+
+
+
+
+
+
+
+---
+### Distribuciones simétricas y asimétricas
+
+- La mayoría de los modelos suponen distribución simétrica de las innovaciones (normal, t-student, etc.).
+
+- Si una distribución `\(X\)` es simétrica alrededor de cero, entonces su función de densidad satisface `$$f(x)=f(-x)$$`
+
+- En la práctica es común enfrentar situaciones en donde los datos presentan asimetría. Por ejemplo, más impacto en los retornos negativos que los positivos, etc.
+
+- La idea es incorporar asimetría a una distribución simétrica que ya es conocida.
+
+---
+### Incorporación de la asimetría en una distribución simétrica
+
+- Sea `\(f(x)\)` la función de densidad simétrica de una variable aleatoria y `\(\gamma \in (0,\infty)\)`.
+
+- La clase de distribuciones asimétricas generadas a partir de `\(f(x)\)` se define como:
+`$$p(x|\gamma) =\frac{2}{\gamma+\frac{1}{\gamma}} \left[ f\left(\frac{x}{\gamma}\right) I_{[0,\infty)}(x) + f(\gamma x) I_{(-\infty,0]}(x) \right]$$`
+- La idea es introducir factores de escala inversa tanto en el lado positivo como el negativo del dominio.
+
+- La moda sigue siendo cero y `\(p(x|\gamma)\)` es asimétrica cuando `\(\gamma \neq 1\)`.
+
+- Entre las más conocidas son:
+  - normal asimétrica 
+  - t-student asimétrica
+  - error generalizada asimétrica
+
+---
+### Distribución normal asimétrica
+
+
+.pull-left[
+- La función de densidad de una normal estandarizada:
+
+`$$f(x)=\frac{1}{\sqrt{2 \pi}}e^{\frac{-1}{2}x^2},~~x \in 	\mathbb{R}$$`
+]
+
+.pull-right[
+
+&lt;img src="clase14_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+### Distribución t-student asimétrica
+
+.pull-left[
+- La función de densidad de una t-student estandarizada:
+
+`$$f(t)=\frac{\Gamma(\frac{\nu+1}{2})}{\Gamma(\sqrt{\nu \pi}\frac{\nu}{2})}\left( 1+\frac{t^2}{\nu}\right)^{-(\nu+1)/2},$$`
+
+y `\(t \in 	\mathbb{R}\)`
+]
+
+.pull-right[
+
+&lt;img src="clase14_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+### Distribución de error generalizad 
+
+- La función de densidad de una distribución de error generalizada:
+
+`$$f(x)=\frac{\beta}{2 \alpha \Gamma\left(\frac{1}{\beta}\right)}e^{\left( \frac{|x-\mu|}{\alpha}\right)^\beta}, x \in 	\mathbb{R}$$`
+con parámetro de locación `\(\mu \in \mathbb{R}\)`, escala `\(\alpha &gt;0\)` y forma `\(\beta &gt;0\)`.
+
+
+---
+### Distribución de error generalizad 
+
+- Considere una distribución de error generalizada con `\(\mu=0, \alpha=1, \beta=3\)` y su versión asimétrica con `\(\gamma\)`.
+
+&lt;img src="clase14_files/figure-html/unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

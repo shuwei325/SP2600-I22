@@ -39,3 +39,4 @@ Las clases grabadas se encuentran
 | 11     | [Clase 11](https://shuwei325.github.io/SP2600-I22/clase11.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab10.R)   |
 | 12     | Exposiciones                                                    | [lab](https://shuwei325.github.io/SP2600-I22/lab11.R)   |
 | 13     | [Clase 13](https://shuwei325.github.io/SP2600-I22/clase13.html) |                                                         |
+| 14     | [Clase 14](https://shuwei325.github.io/SP2600-I22/clase14.html) | [lab](https://shuwei325.github.io/SP2600-I22/lab12.R)   |
